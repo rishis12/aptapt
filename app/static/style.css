@@ -156,10 +156,15 @@ label.check input { width: auto; min-height: 0; margin-top: 4px; }
 .hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hero-slide { position: absolute; inset: 0; color: var(--ink); text-decoration: none; opacity: 0; visibility: hidden; transition: opacity .7s ease, visibility 0s linear .7s; }
 .hero-slide.is-active { opacity: 1; visibility: visible; transition: opacity .7s ease; z-index: 1; }
-.hero-controls { position: absolute; top: 20px; right: 20px; z-index: 2; display: flex; align-items: stretch; background: var(--white); }
-.hero-controls button { border: 0; background: var(--white); color: var(--ink); font: 600 .85rem var(--font); padding: 8px 12px; cursor: pointer; }
-.hero-controls button:hover { background: var(--lit); }
-.hero-controls span { display: grid; place-items: center; padding: 0 10px; font-size: .85rem; font-weight: 700; font-variant-numeric: tabular-nums; border-inline: 1px solid var(--line); }
+.hero-feature::after { content: ""; position: absolute; inset: 0 0 auto; height: 160px; z-index: 2; pointer-events: none; background: linear-gradient(to bottom, rgba(8, 24, 34, .82), transparent); }
+.hero-controls { position: absolute; top: 20px; right: 20px; z-index: 3; display: flex; align-items: center; gap: 8px; background: transparent; color: var(--white); text-shadow: 0 1px 4px rgba(0, 0, 0, .65); }
+.hero-controls button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; padding: 10px 14px; border: 1px solid rgba(255, 255, 255, .65); border-radius: 999px; background: transparent; color: var(--white); font: 700 .9rem var(--font); text-shadow: inherit; cursor: pointer; transition: color .15s ease, border-color .15s ease; }
+.hero-controls button[data-prev]::before { content: "←"; font-size: 1.2rem; line-height: 1; }
+.hero-controls button[data-next]::after { content: "→"; font-size: 1.2rem; line-height: 1; }
+.hero-controls button:hover { background: transparent; color: var(--lit); border-color: var(--lit); }
+.hero-controls button:focus-visible { outline: 3px solid var(--lit); outline-offset: 3px; }
+.hero-controls span { display: grid; place-items: center; min-width: 52px; padding: 0 4px; font-size: .9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 400px) { .hero-controls { top: 16px; right: 12px; gap: 6px; } .hero-controls button { padding-inline: 10px; gap: 6px; } }
 .hero-timer { position: absolute; left: 0; right: 0; top: 0; height: 4px; z-index: 2; background: rgba(14, 42, 59, .35); }
 .hero-timer i { display: block; height: 100%; width: 0; background: var(--lit); }
 .hero-timer i.is-running { width: 100%; transition: width var(--slide-ms, 6000ms) linear; }
