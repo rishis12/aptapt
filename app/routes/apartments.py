@@ -87,7 +87,7 @@ def detail(slug):
 @bp.post("/buildings/<slug>/commit")
 @renter_required
 def commit(slug):
-    """Start the $15 commitment checkout for the building's open committed group."""
+    """Start the $100 commitment checkout for the building's open committed group."""
     db = get_db()
     apt = get_building(db, slug)
     group = svc.get_or_create_open_committed(db, apt["id"])

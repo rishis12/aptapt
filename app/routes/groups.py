@@ -132,7 +132,7 @@ def act(group_id, action, success, back=None):
 @bp.post("/groups/<int:group_id>/join")
 @renter_required
 def join(group_id):
-    """Exploratory groups are free; committed groups go through the $15 checkout."""
+    """Exploratory groups are free; committed groups go through the $100 checkout."""
     db = get_db()
     group = svc.get_group(db, group_id)
     if group["kind"] == "committed":
@@ -152,7 +152,7 @@ def leave(group_id):
     db = get_db()
     if svc.get_group(db, group_id)["kind"] == "committed":
         return act(group_id, lambda db: svc.leave_committed(db, group_id, g.user["id"]),
-                   "You left the group. Your $15 deposit was forfeited.")
+                   "You left the group. Your $100 deposit was forfeited.")
     return act(group_id, lambda db: svc.leave_exploratory(db, group_id, g.user["id"]), "You left the group.")
 
 
@@ -235,7 +235,7 @@ def sign(group_id):
         try:
             deals.sign(db, ctx["deal"]["id"], g.user["id"], request.form.get("signature"))
             db.commit()
-            flash("Lease signed. Your $15 commitment deposit is on its way back.", "success")
+            flash("Lease signed. Your $100 commitment deposit is on its way back.", "success")
             return redirect(url_for("groups.show", group_id=group_id))
         except svc.GroupError as err:
             flash(str(err), "error")

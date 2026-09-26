@@ -67,7 +67,7 @@ def ledger(db, user_id):
 
 
 def record_commitment(db, group_id, user_id, brand, last4):
-    """Record a successful $15 commitment and add the member. Returns the next group if a deal unlocked."""
+    """Record a successful $100 commitment and add the member. Returns the next group if a deal unlocked."""
     svc.can_commit(db, group_id, user_id)
     _deposit(db, user_id, group_id, "commitment", svc.COMMITMENT_CENTS, brand, last4)
     return svc.add_committed_member(db, group_id, user_id)

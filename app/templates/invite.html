@@ -27,7 +27,7 @@
         <a href="{{ url_for('auth.login', next=request.path) }}">I have an account</a>
       {% elif current_user.role == 'renter' %}
         <form method="post" action="{{ url_for('groups.join', group_id=group.id) }}">
-          {{ csrf_field() }}<button class="btn">{{ 'Commit with a $15 deposit' if group.kind == 'committed' else 'Join the group' }}</button>
+          {{ csrf_field() }}<button class="btn">{{ 'Commit with a $100 deposit' if group.kind == 'committed' else 'Join the group' }}</button>
         </form>
       {% endif %}
       {% if apt %}<a class="btn btn-quiet" href="{{ url_for('apartments.detail', slug=apt.slug) }}">See {{ apt.name }}</a>{% endif %}

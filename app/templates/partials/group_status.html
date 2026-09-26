@@ -47,13 +47,13 @@
         <li class="{{ 'done' if my_deal.status == 'signed' else ('current' if my_deal.status == 'reserved' else '') }}">
           <div>
             <h3>Sign your lease</h3>
-            <p>{% if my_deal.status == 'signed' %}Signed {{ my_deal.signed_at|date }}. Your $15 commitment deposit was refunded.{% else %}Review the terms and sign. Your $15 comes back when you do.{% endif %}</p>
+            <p>{% if my_deal.status == 'signed' %}Signed {{ my_deal.signed_at|date }}. Your $100 commitment deposit was refunded.{% else %}Review the terms and sign. Your $100 comes back when you do.{% endif %}</p>
           </div>
           {% if my_deal.status == 'reserved' %}<a class="btn" href="{{ url_for('groups.sign', group_id=group.id) }}">Sign lease</a>{% endif %}
         </li>
       </ol>
       {% if my_deal.status in ('pending', 'reserved') and deal.status in ('reserving', 'short') %}
-        <form method="post" action="{{ url_for('groups.leave', group_id=group.id) }}" data-confirm="Back out of the deal? You'll forfeit your $15 commitment deposit.">
+        <form method="post" action="{{ url_for('groups.leave', group_id=group.id) }}" data-confirm="Back out of the deal? You'll forfeit your $100 commitment deposit.">
           {{ csrf_field() }}<button class="linklike danger">Back out of the deal</button>
         </form>
       {% endif %}
@@ -63,7 +63,7 @@
 
   {% elif group.status == 'expired' %}
     {{ ui.meter(count, target, 'lg', None, animate) }}
-    <p class="callout">This group reached its due date without unlocking a deal. Everyone's $15 deposit was refunded.</p>
+    <p class="callout">This group reached its due date without unlocking a deal. Everyone's $100 deposit was refunded.</p>
 
   {% else %}
     {{ ui.meter(count, target, 'lg', None, animate) }}
@@ -138,7 +138,7 @@
   {# Joining #}
   {% if commit_open %}
     <form method="post" action="{{ url_for('groups.join', group_id=group.id) }}">
-      {{ csrf_field() }}<button class="btn btn-block">Commit with a $15 deposit</button>
+      {{ csrf_field() }}<button class="btn btn-block">Commit with a $100 deposit</button>
     </form>
     <p class="fine">Refunded when you sign your lease, or if the group misses its due date. Leaving forfeits it.</p>
   {% elif not current_user and group.status not in ('unlocked', 'expired') %}
@@ -151,16 +151,16 @@
 
   {% if is_member and not deal and group.status in ('forming', 'agent_invited', 'offer_active', 'pitch_sent') %}
     <div class="member-foot">
-      {% if my_deposit %}<p class="fine">Your $15 deposit is held on {{ my_deposit.card_brand }} ending {{ my_deposit.card_last4 }}.</p>{% endif %}
-      <form method="post" action="{{ url_for('groups.leave', group_id=group.id) }}" data-confirm="Leave the group? You'll forfeit your $15 deposit.">
-        {{ csrf_field() }}<button class="linklike danger">Leave group and forfeit $15</button>
+      {% if my_deposit %}<p class="fine">Your $100 deposit is held on {{ my_deposit.card_brand }} ending {{ my_deposit.card_last4 }}.</p>{% endif %}
+      <form method="post" action="{{ url_for('groups.leave', group_id=group.id) }}" data-confirm="Leave the group? You'll forfeit your $100 deposit.">
+        {{ csrf_field() }}<button class="linklike danger">Leave group and forfeit $100</button>
       </form>
     </div>
   {% endif %}
 
 {% else %}
 
-  <p class="muted">Keep a shortlist of buildings and talk it through. When you agree on one, each of you commits there with a $15 deposit and joins that building's committed group.</p>
+  <p class="muted">Keep a shortlist of buildings and talk it through. When you agree on one, each of you commits there with a $100 deposit and joins that building's committed group.</p>
 
   {% if shortlist %}
     <ul class="shortlist">

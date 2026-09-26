@@ -13,7 +13,7 @@
     {% if my_deal.move_in %}<div><dt>Start date</dt><dd>{{ my_deal.move_in|date('%B %-d, %Y') }}</dd></div>{% endif %}
     <div><dt>Term</dt><dd>12 months</dd></div>
     <div><dt>Group incentive</dt><dd>{{ offer.title }}{% if offer.details %}. {{ offer.details }}{% endif %}</dd></div>
-    <div><dt>Deposits</dt><dd>$250 holding deposit applied to month one. $15 aptapt commitment refunded on signing.</dd></div>
+    <div><dt>Deposits</dt><dd>$250 holding deposit applied to month one. $100 aptapt commitment refunded on signing.</dd></div>
   </dl>
   <form method="post" class="signature" autocomplete="off">
     {{ csrf_field() }}

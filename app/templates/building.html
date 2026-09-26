@@ -128,13 +128,13 @@
       <a class="btn btn-block" href="{{ url_for('auth.signup', next=request.path) }}">Create an account to commit</a>
     {% elif current_user.role == 'renter' %}
       <form method="post" action="{{ url_for('apartments.commit', slug=apt.slug) }}">
-        {{ csrf_field() }}<button class="btn btn-block">Commit with a $15 deposit</button>
+        {{ csrf_field() }}<button class="btn btn-block">Commit with a $100 deposit</button>
       </form>
     {% endif %}
     {% if committed and not committed_is_member %}
       <a class="deal-panel-link" href="{{ url_for('groups.show', group_id=committed.id) }}">See the group first</a>
     {% endif %}
-    <p class="fine">You get your $15 back when you sign your lease, or if the group misses its due date. Leaving the group forfeits it.</p>
+    <p class="fine">You get your $100 back when you sign your lease, or if the group misses its due date. Leaving the group forfeits it.</p>
   </aside>
 </div>
 {% endblock %}

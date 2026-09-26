@@ -19,7 +19,7 @@ INCENTIVE_TYPES = {
 }
 OPEN_COMMITTED = ("forming", "agent_invited", "offer_active", "pitch_sent")
 COMMIT_WINDOW_DAYS = 30
-COMMITMENT_CENTS = 1500
+COMMITMENT_CENTS = 10000
 MIN_REQUIRED_SIZE = 2
 MAX_REQUIRED_SIZE = 200
 MAX_GROUP_NAME = 60
@@ -251,7 +251,7 @@ def user_groups(db, user_id):
 def join_exploratory(db, group_id, user_id):
     group = get_group(db, group_id)
     if group["kind"] != "exploratory":
-        raise GroupError("Committed groups require a $15 commitment deposit to join.")
+        raise GroupError("Committed groups require a $100 commitment deposit to join.")
     if is_member(db, group_id, user_id):
         return
     db.execute("INSERT INTO memberships (group_id, user_id) VALUES (?, ?)", (group_id, user_id))
@@ -316,7 +316,7 @@ def add_committed_member(db, group_id, user_id):
 
 
 def leave_committed(db, group_id, user_id):
-    """Leaving always forfeits the $15 commitment deposit."""
+    """Leaving always forfeits the $100 commitment deposit."""
     from . import deals, payments
     group = get_group(db, group_id)
     if not is_member(db, group_id, user_id):
@@ -341,7 +341,7 @@ def expire_group(db, group_id):
                (group_id,))
     for member in members(db, group_id):
         payments.resolve_commitment(db, group_id, member["id"], "refunded", "Group missed its due date")
-    post_system(db, group_id, "The due date passed without unlocking a deal. Everyone's $15 deposit was refunded.")
+    post_system(db, group_id, "The due date passed without unlocking a deal. Everyone's $100 deposit was refunded.")
 
 
 # --- invites ---------------------------------------------------------------

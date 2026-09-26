@@ -68,7 +68,7 @@ def test_csrf_blocks_posts_without_token(seeded):
 
 
 def test_offer_path_commit_unlock_reserve_sign(client, db):
-    """Seven20: Sam pays $15, simulated renters fill it, Sam reserves and signs."""
+    """Seven20: Sam pays $100, simulated renters fill it, Sam reserves and signs."""
     s = slug(db, "seven20")
     gid = svc.open_committed_group(db, apt_id(db, "seven20"))["id"]
     login(client, "sam@example.test")

@@ -21,7 +21,7 @@ so real card data can't be entered. Only the brand and last 4 digits are stored.
 
 | Deposit | Amount | When | Refunded | Forfeited |
 |---|---|---|---|---|
-| Commitment | $15 | Joining a committed group | Group misses its due date; you sign the lease; the deal is cancelled; you're released after rejecting a counter-offer | You leave the group at any time; you don't reserve before the window closes |
+| Commitment | $100 | Joining a committed group | Group misses its due date; you sign the lease; the deal is cancelled; you're released after rejecting a counter-offer | You leave the group at any time; you don't reserve before the window closes |
 | Holding | $250 | Reserving after unlock | Deal cancelled | Kept by the property toward your first month's rent (simulated) |
 
 ## Committed group lifecycle
@@ -42,7 +42,7 @@ When a group unlocks, the next committed group for that building starts forming 
 ## After unlock (a "deal")
 A 72-hour **reservation window** opens. Each member's checklist:
 1. **Reserve**: floor plan and move-in date → application (fake values allowed) → $250 holding deposit through checkout → receipt
-2. **Sign lease**: review the terms, then sign by typing your name. Signing refunds the $15 commitment deposit.
+2. **Sign lease**: review the terms, then sign by typing your name. Signing refunds the $100 commitment deposit.
 
 The agent's roster shows each member's progress, and the agent can nudge members.
 When the window closes, anyone who hasn't reserved is dropped and forfeits their commitment deposit. If fewer than the target remain, the deal is **short**, and the agent chooses:

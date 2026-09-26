@@ -31,7 +31,7 @@ Configuration (environment variables):
 ## How it works
 
 - **Groups** are free and not tied to a building. Members chat, invite friends, and keep a shortlist of buildings.
-- **Committing** to a building costs a $15 deposit (simulated). You're refunded when you sign your lease, or if the
+- **Committing** to a building costs a $100 deposit (simulated). You're refunded when you sign your lease, or if the
   group misses its due date. Leaving the group forfeits it.
 - **If the manager is on aptapt:** at 3 committed renters the group invites the leasing office. The office posts an offer,
   and when the group reaches the offer's size, the deal unlocks.
