@@ -231,9 +231,6 @@ body.is-browse { height: 100vh; display: flex; flex-direction: column; overflow:
 .building-info h1 { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 900; font-stretch: 125%; line-height: .95; letter-spacing: -.03em; }
 .building-info h2 { margin-top: 40px; }
 .building-address { font-size: 1.1rem; color: var(--ink-2); }
-.building-links { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; margin-top: -4px; }
-.building-links a { font-weight: 600; }
-.building-links span { font-size: .9rem; }
 .sources { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: .9rem; }
 .building-desc { font-size: 1.1rem; max-width: 62ch; margin-top: 28px; }
 .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 28px 0 0; border-top: 2px solid var(--ink); }
