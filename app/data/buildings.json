@@ -106,61 +106,8 @@
     ]
   },
   {
-    "slug": "atmosphere-on-mifflin",
-    "name": "Atmosphere on Mifflin",
-    "address": "619-699 W Mifflin St, Madison, WI",
-    "zip": "53703",
-    "neighborhood": "Bassett",
-    "lat": 43.0696124,
-    "lng": -89.3938665,
-    "kind": "student",
-    "leasing": "per_bed",
-    "stories": 10,
-    "units": 264,
-    "beds": 697,
-    "developer": "Trinitas Ventures (joint venture with Starwood Capital Group)",
-    "opening": "Summer 2028",
-    "status": "Under construction",
-    "floor_plans": [
-      "Studio",
-      "1BR",
-      "2BR",
-      "3BR",
-      "4BR",
-      "5BR"
-    ],
-    "rent_min": 1050,
-    "rent_max": 1700,
-    "rent_is_estimate": true,
-    "amenities": [
-      "Rooftop pool and sauna",
-      "Fitness center",
-      "15,000+ sq ft clubhouse and amenity space",
-      "Interior and exterior courtyards",
-      "Terrace with Capitol and Kohl Center views",
-      "Historic Wiedenbeck-Dobelin Warehouse kept as part of the community"
-    ],
-    "description": "A 10-story student community on West Mifflin Street, built around the historic Wiedenbeck-Dobelin Warehouse and next to the old Milwaukee Road depot. It offers everything from studios to five-bedroom units a short walk from the UW campus and the Kohl Center, with a rooftop pool among its shared spaces.",
-    "website": null,
-    "sources": [
-      "https://www.channel3000.com/news/10-story-student-housing-development-coming-to-west-mifflin-street/article_776ee9f7-becc-4338-aa15-74e0d33f40f6.html",
-      "https://rebusinessonline.com/starwood-capital-trinitas-to-develop-three-student-housing-communities-totaling-2046-beds/",
-      "https://ibmadison.com/city-council-oks-10-story-mifflin-street-redevelopment-project/",
-      "https://downtownmadison.org/map-marker/619-and-699-w-mifflin-street/",
-      "https://www.universityliving.com/united-states/madison-heights/property/atmosphere-madison"
-    ],
-    "notes": "Unit and bed counts conflict across sources. The downtown tracker says ~239 units; the Dec 2024 council approval (ibmadison) says 665 beds; the Sep 11, 2026 announcements (Channel3000, REBusiness) say 264 units / 697 beds. I used the most recent figures. Construction reportedly began in August 2026, with completion in summer 2028. The unit mix (studios through 5-bed, plus some double-occupancy rooms) comes from the 2024 approval; the floor plan list is a summary of it. No rents are published. The estimate is per bed, based on Trinitas's nearby Atmosphere Madison (listed from about $1,039/bed) and other new downtown student high-rises, which run roughly $1,000-$1,700/bed. There is no dedicated property website yet. The only rendering found is low resolution (616px), from Trinitas via Channel3000; REBusiness ran the same rendering, so only one photo is kept.",
-    "photos": [
-      {
-        "file": "img/buildings/atmosphere-on-mifflin/1.jpg",
-        "credit": "Rendering: Trinitas Ventures",
-        "source_url": "https://bloximages.newyork1.vip.townnews.com/channel3000.com/content/tncms/assets/v3/editorial/e/13/e1350762-502c-42a1-a601-c7670a885808/6aa4005c2a0aa.image.png"
-      }
-    ]
-  },
-  {
     "slug": "oliv-madison-broom",
-    "name": "\u014dLiv Madison Broom",
+    "name": "ōLiv Madison Broom",
     "address": "W Johnson St & N Broom St, Madison, WI",
     "zip": "53703",
     "neighborhood": "Campus/State St",
@@ -204,7 +151,7 @@
       "https://captimes.com/news/development/student-apartment-tower-with-1-600-beds-gets-first-ok-from-madison/article_56d71efe-833c-11ee-a89c-d71a584b9fa8.html",
       "https://www.dailycardinal.com/article/2023/09/new-student-high-rise-johnson-broom-to-include-10-affordable-units"
     ],
-    "notes": "The brand is \u014dLiv (Core Spaces' premium label), not Hub or Rise. Hub Madison Bassett is a different Core Spaces building at Johnson & Bassett that opened in fall 2026. Counts vary by source: the downtown tracker says ~437 units; the 2023 approval said 465 units / 1,600+ beds; the architect (Antunovich) says 472 units / 1,646 beds / 14 stories; Student Housing Business says 15 stories, 474 units, 1,723 beds. I used the most recent developer-reported figures (474 / 1,723 / 15). Multifamily Dive (Aug 2026) and JCRE list delivery in 2027 (Q1 2027 for retail), so 'Under construction' is inferred. No official leasing site for Broom was found (olivmadison.com is the separate 339 W Gorham building). There is no single street address, so the coordinates are from Nominatim for 357 W Johnson St, on the project block. Rents are not published. The per-bed estimate is based on the existing \u014dLiv Madison and Hub Madison (roughly $1,100-$2,000/bed depending on unit size); the 10% affordable beds are 40% below market. The floor plan list is from JCRE (studio, 1, 2, 4, 5-bed) plus townhomes from Student Housing Business. Only one rendering was found.",
+    "notes": "The brand is ōLiv (Core Spaces' premium label), not Hub or Rise. Hub Madison Bassett is a different Core Spaces building at Johnson & Bassett that opened in fall 2026. Counts vary by source: the downtown tracker says ~437 units; the 2023 approval said 465 units / 1,600+ beds; the architect (Antunovich) says 472 units / 1,646 beds / 14 stories; Student Housing Business says 15 stories, 474 units, 1,723 beds. I used the most recent developer-reported figures (474 / 1,723 / 15). Multifamily Dive (Aug 2026) and JCRE list delivery in 2027 (Q1 2027 for retail), so 'Under construction' is inferred. No official leasing site for Broom was found (olivmadison.com is the separate 339 W Gorham building). There is no single street address, so the coordinates are from Nominatim for 357 W Johnson St, on the project block. Rents are not published. The per-bed estimate is based on the existing ōLiv Madison and Hub Madison (roughly $1,100-$2,000/bed depending on unit size); the 10% affordable beds are 40% below market. The floor plan list is from JCRE (studio, 1, 2, 4, 5-bed) plus townhomes from Student Housing Business. Only one rendering was found.",
     "photos": [
       {
         "file": "img/buildings/oliv-madison-broom/1.jpg",
@@ -243,7 +190,7 @@
     "amenities": [
       "Rooftop pool and spa deck",
       "Fitness center and sauna",
-      "Caf\u00e9",
+      "Café",
       "Private and group study rooms",
       "Game room",
       "Dog wash / pet spa",
@@ -278,5 +225,76 @@
         "source_url": "https://theorymadison.com/wp-content/uploads/2026/09/TM_Exteriors-5-scaled.jpg"
       }
     ]
+  },
+  {
+    "slug": "axton",
+    "name": "Axton",
+    "address": "750 Regent St, Madison, WI",
+    "zip": "53715",
+    "neighborhood": "Regent / Kohl Center",
+    "lat": 43.0683755,
+    "lng": -89.3972585,
+    "kind": "student",
+    "leasing": "per_bed",
+    "stories": 12,
+    "units": 363,
+    "beds": 681,
+    "developer": "Trinitas Ventures",
+    "opening": "Open now",
+    "status": "Now leasing",
+    "floor_plans": [
+      "Studio",
+      "1BR",
+      "2BR",
+      "3BR",
+      "4BR",
+      "5BR",
+      "Townhome"
+    ],
+    "rent_min": 1049,
+    "rent_max": null,
+    "rent_is_estimate": false,
+    "amenities": [
+      "Rooftop pool with hot tub",
+      "24/7 fitness center and yoga room",
+      "Private study lounges",
+      "Podcast studio",
+      "Meditation and wellness room",
+      "Outdoor fire pits and grills",
+      "Fully furnished units",
+      "Pet friendly"
+    ],
+    "description": "A 12-story student building on Regent Street, a few minutes' walk from the Kohl Center and campus. Every resident gets a private bedroom and bathroom in layouts from studios to five-bedroom apartments, and the roof has a pool and hot tub overlooking downtown.",
+    "website": "https://axtonmadison.com/",
+    "photos": [
+      {
+        "file": "img/buildings/axton/1.jpg",
+        "credit": "Photo: Axton",
+        "source_url": "https://axtonmadison.com/wp-content/uploads/sites/93/2025/10/A-colorful-and-modern-apartment-building-with-red-and-orange-design.jpg"
+      },
+      {
+        "file": "img/buildings/axton/2.jpg",
+        "credit": "Photo: Axton",
+        "source_url": "https://axtonmadison.com/wp-content/uploads/sites/93/2025/10/559139.jpg"
+      },
+      {
+        "file": "img/buildings/axton/3.jpg",
+        "credit": "Photo: Axton",
+        "source_url": "https://axtonmadison.com/wp-content/uploads/sites/93/2025/10/Poolside-cabanas-with-orange-curtains-and-modern-seating.jpg"
+      },
+      {
+        "file": "img/buildings/axton/4.jpg",
+        "credit": "Photo: Axton",
+        "source_url": "https://axtonmadison.com/wp-content/uploads/sites/93/2025/10/Greenspace-courtyard-with-a-large-TV-artful-lamps.-and-plantlife.jpg"
+      }
+    ],
+    "sources": [
+      "https://axtonmadison.com/",
+      "https://axtonmadison.com/amenities/",
+      "https://bkvgroup.com/projects/trinitas-regent-street/",
+      "https://www.apartments.com/axton-madison-wi/p4w0yjr/",
+      "https://offcampushousing.wisc.edu/city/madison-wi/listing/axton-105385"
+    ],
+    "notes": "Formerly Atmosphere Madison (Trinitas, opened 2024), renamed Axton. Replaced the unbuilt 619 W Mifflin project (Atmosphere on Mifflin, completion 2028) in this demo. Unit/bed/story counts from BKV Group (12 stories, 363 units, 681 beds). Rent: apartments.com lists from $1,049; offcampushousing.wisc.edu lists from $1,299; the site advertises rates as low as $824 with a $375/mo concession. Real manager is Cardinal Group; the demo uses a fictional manager."
   }
 ]

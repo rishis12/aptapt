@@ -36,8 +36,8 @@ MANAGERS = [
      "email": "dana@campuskey.test", "on_aptapt": True},
     {"match": "bella", "company": "Isthmus Property Group", "contact": "Casey Nguyen",
      "email": "casey@isthmuspg.test", "on_aptapt": False},
-    {"match": "mifflin", "company": "Mifflin Street Management", "contact": "Jamie Lindqvist",
-     "email": "jamie@mifflinmgmt.test", "on_aptapt": False},
+    {"match": "axton", "company": "Regent Street Living", "contact": "Jamie Lindqvist",
+     "email": "jamie@regentliving.test", "on_aptapt": False},
     {"match": "", "company": "Northgate Student Living", "contact": "Rae Okafor",  # fallback (Johnson & Broome)
      "email": "rae@northgate.test", "on_aptapt": False},
 ]
@@ -55,6 +55,17 @@ def load_buildings():
     if not BUILDINGS_JSON.exists():
         raise RuntimeError(f"Missing {BUILDINGS_JSON}. It holds the real building data.")
     return json.loads(BUILDINGS_JSON.read_text())
+
+
+PREFERRED_INFO_SOURCES = ("downtownmadison.org", "antunovich.com")
+
+
+def info_url(building):
+    """The official site if there is one, otherwise the most neutral public page about the project."""
+    if building.get("website"):
+        return building["website"]
+    sources = building.get("sources") or []
+    return next((u for pref in PREFERRED_INFO_SOURCES for u in sources if pref in u), sources[0] if sources else None)
 
 
 def manager_for(building):
@@ -85,13 +96,15 @@ def seed(db):
         apt[mgr["match"] or "broome"] = db.execute(
             """INSERT INTO apartments (slug, name, address, neighborhood, zip, lat, lng, kind, leasing, stories, units,
                beds, developer, opening, status_text, floor_plans, rent_min, rent_max, rent_is_estimate, amenities,
-               description, website, photos, manager_company, contact_name, contact_email, agent_user_id)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               description, website, info_url, sources, photos, manager_company, contact_name, contact_email,
+               agent_user_id)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (b["slug"], b["name"], re.sub(r",\s*Madison,?\s*WI.*$", "", b["address"]), b["neighborhood"], b["zip"], b["lat"], b["lng"], b["kind"],
              b["leasing"], b.get("stories"), b.get("units"), b.get("beds"), b.get("developer"), b.get("opening"),
              b.get("status"), json.dumps(b.get("floor_plans") or []), b.get("rent_min"), b.get("rent_max"),
              int(bool(b.get("rent_is_estimate", True))), json.dumps(b.get("amenities") or []),
-             b.get("description") or "", b.get("website"), json.dumps(b.get("photos") or []),
+             b.get("description") or "", b.get("website"), info_url(b), json.dumps(b.get("sources") or []),
+             json.dumps(b.get("photos") or []),
              mgr["company"], mgr["contact"], mgr["email"], agent_id if mgr["on_aptapt"] else None),
         ).lastrowid
 
@@ -147,12 +160,12 @@ def _seed_scenarios(db, apt, renter, agents):
     # Johnson & Broome: exploratory interest only.
     # A friend group weighing three student buildings before anyone commits.
     friends = svc.create_exploratory(db, renter["jordan"], "Sellery Hall friends", apt.get("broome"))
-    for key in ("theory", "mifflin"):
+    for key in ("theory", "axton"):
         if apt.get(key):
             svc.add_to_shortlist(db, friends, apt[key], renter["jordan"])
     svc.join_exploratory(db, friends, renter["sam"])
     svc.add_fake_members(db, friends, 3)
-    svc.post_chat(db, friends, renter["jordan"], "Theory is open now, ōLiv and Atmosphere aren't built yet. "
+    svc.post_chat(db, friends, renter["jordan"], "Theory and Axton are open now, ōLiv isn't built yet. "
                                                  "If we want a 5BR together, which one do we commit to?")
     svc.post_chat(db, friends, renter["sam"], "Theory already has a group forming. If we all commit there we'd "
                                               "fill it basically by ourselves.")

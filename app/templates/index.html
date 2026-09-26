@@ -3,7 +3,6 @@
 {% block title %}Lease together{% endblock %}
 {% block main_class %}home{% endblock %}
 {% block content %}
-{% set lead = buildings[0] if buildings else None %}
 <section class="hero">
   <div class="hero-copy">
     <h1>Sign together.<br>Pay less.</h1>
@@ -18,18 +17,39 @@
       <datalist id="madison-zips">{% for z in zips %}<option value="{{ z.zip }}">{{ z.label }}</option>{% endfor %}</datalist>
     </form>
   </div>
-  {% if lead %}
-  <a class="hero-feature" href="{{ url_for('apartments.detail', slug=lead.apt.slug) }}">
-    {{ ui.photo(lead.apt, lead.apt.photos|fromjson, 'hero-photo', eager=True) }}
-    <div class="hero-feature-card">
-      {% set s = lead.stats %}
-      {{ ui.meter(s.committed_count, s.offer.required_size if s.offer else invite_threshold, 'md', animate=True) }}
-      <div>
-        <p class="hero-feature-name">{{ lead.apt.name }}</p>
-        <p>{{ s.committed_count }} of {{ s.offer.required_size if s.offer else invite_threshold }} committed{% if s.offer %} for {{ s.offer.title|lower }}{% endif %}</p>
+  {% if buildings %}
+  <div class="hero-feature" data-carousel aria-roledescription="carousel" aria-label="Buildings with groups forming">
+    {% for b in buildings %}
+      {% set s = b.stats %}
+      {% set target = s.offer.required_size if s.offer else invite_threshold %}
+      <a class="hero-slide{% if loop.first %} is-active{% endif %}" href="{{ url_for('apartments.detail', slug=b.apt.slug) }}"
+         aria-roledescription="slide" aria-label="{{ loop.index }} of {{ loop.length }}: {{ b.apt.name }}"
+         {% if not loop.first %}aria-hidden="true" tabindex="-1"{% endif %}>
+        {{ ui.photo(b.apt, b.apt.photos|fromjson, 'hero-photo', eager=True) }}
+        <div class="hero-feature-card">
+          {{ ui.meter(s.committed_count, target, 'md', animate=loop.first) }}
+          <div>
+            <p class="hero-feature-name">{{ b.apt.name }}</p>
+            {% if s.committed_group and s.committed_count %}
+              <p>{{ s.committed_count }} of {{ target }} committed{% if s.offer %} for {{ s.offer.title|lower }}{% endif %}</p>
+            {% elif s.interested %}
+              <p>{{ s.interested }} renters are considering it. No one has committed yet.</p>
+            {% else %}
+              <p>Opens {{ b.apt.opening or 'now' }}. Be the first to start a group.</p>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+    {% if buildings|length > 1 %}
+      <div class="hero-controls">
+        <button type="button" data-prev aria-label="Previous building">Previous</button>
+        <span data-counter aria-live="polite">1 / {{ buildings|length }}</span>
+        <button type="button" data-next aria-label="Next building">Next</button>
       </div>
-    </div>
-  </a>
+      <div class="hero-timer" aria-hidden="true"><i data-timer></i></div>
+    {% endif %}
+  </div>
   {% endif %}
 </section>
 

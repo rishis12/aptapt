@@ -94,6 +94,12 @@ def create_app(test_config=None):
     def first_name(name):
         return (name or "").split()[0] if name else ""
 
+    @app.template_filter("domain")
+    def domain(url):
+        from urllib.parse import urlparse
+        host = urlparse(url or "").netloc
+        return host[4:] if host.startswith("www.") else host
+
     @app.template_filter("money")
     def money(value):
         return "—" if value is None else f"${value:,.0f}"

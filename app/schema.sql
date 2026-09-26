@@ -59,6 +59,8 @@ CREATE TABLE apartments (
   amenities TEXT NOT NULL DEFAULT '[]',    -- JSON list
   description TEXT NOT NULL DEFAULT '',
   website TEXT,
+  info_url TEXT,                           -- official site, else the best public project page
+  sources TEXT NOT NULL DEFAULT '[]',      -- JSON list of source URLs
   photos TEXT NOT NULL DEFAULT '[]',       -- JSON list of {file, credit, source_url}
   manager_company TEXT NOT NULL,           -- fictional management company
   contact_name TEXT NOT NULL,              -- fictional leasing contact (pitch recipient)

@@ -28,6 +28,12 @@
   <article class="building-info">
     <h1>{{ apt.name }}</h1>
     <p class="building-address">{{ apt.address }}, Madison, WI {{ apt.zip }}</p>
+    {% if apt.info_url %}
+      <p class="building-links">
+        <a href="{{ apt.info_url }}" target="_blank" rel="noopener">{{ 'Official website' if apt.website else 'Project details' }}</a>
+        <span class="muted">{{ apt.info_url|domain }}{% if not apt.website %}. {{ apt.name }} doesn't have a leasing site yet.{% endif %}</span>
+      </p>
+    {% endif %}
 
     <dl class="facts">
       <div><dt>Status</dt><dd>{{ apt.status_text or 'Leasing' }}</dd></div>
@@ -50,7 +56,6 @@
       {% if apt.agent_user_id %}They're on aptapt, so a committed group can invite them to make an offer.
       {% else %}They aren't on aptapt yet. A committed group sets its own ask, and when it hits its size, we pitch it to them.{% endif %}
     </p>
-    {% if apt.website %}<p><a href="{{ apt.website }}" rel="noopener" target="_blank">Official website</a></p>{% endif %}
 
     <h2>Groups considering {{ apt.name }}</h2>
     <p class="muted">Free groups where renters compare buildings and decide together before anyone puts money down.</p>
@@ -101,6 +106,12 @@
           </li>
         {% endfor %}
       </ul>
+    {% endif %}
+    {% set sources = apt.sources|fromjson %}
+    {% if sources %}
+      <h2>Sources</h2>
+      <p class="muted">Building details are compiled from these public sources and may be out of date.</p>
+      <ul class="sources">{% for u in sources %}<li><a href="{{ u }}" target="_blank" rel="noopener">{{ u|domain }}</a></li>{% endfor %}</ul>
     {% endif %}
   </article>
 

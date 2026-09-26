@@ -53,6 +53,62 @@ document.querySelector("[data-shortlist-target]")?.addEventListener("change", (e
   e.target.closest("form").action = e.target.value;
 });
 
+// ---- home: rotate through every building ----
+const carousel = document.querySelector("[data-carousel]");
+if (carousel) {
+  const slides = [...carousel.querySelectorAll(".hero-slide")];
+  const counter = carousel.querySelector("[data-counter]");
+  const timer = carousel.querySelector("[data-timer]");
+  const SLIDE_MS = 6000;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let index = 0;
+  let handle = null;
+
+  const restartTimerBar = () => {
+    if (!timer) return;
+    timer.classList.remove("is-running");
+    void timer.offsetWidth;
+    timer.style.setProperty("--slide-ms", `${SLIDE_MS}ms`);
+    timer.classList.add("is-running");
+  };
+  const show = (i) => {
+    index = (i + slides.length) % slides.length;
+    slides.forEach((slide, n) => {
+      const active = n === index;
+      slide.classList.toggle("is-active", active);
+      if (active) {
+        slide.removeAttribute("aria-hidden");
+        slide.removeAttribute("tabindex");
+      } else {
+        slide.setAttribute("aria-hidden", "true");
+        slide.setAttribute("tabindex", "-1");
+      }
+    });
+    if (counter) counter.textContent = `${index + 1} / ${slides.length}`;
+    const facade = slides[index].querySelector(".facade");
+    if (facade && !reduceMotion) {  // replay the windows lighting up
+      facade.classList.remove("is-animated");
+      void facade.offsetWidth;
+      facade.classList.add("is-animated");
+    }
+  };
+  const stop = () => { clearInterval(handle); handle = null; timer?.classList.remove("is-running"); };
+  const start = () => {
+    if (reduceMotion || slides.length < 2) return;
+    stop();
+    restartTimerBar();
+    handle = setInterval(() => { show(index + 1); restartTimerBar(); }, SLIDE_MS);
+  };
+
+  carousel.querySelector("[data-next]")?.addEventListener("click", () => { show(index + 1); start(); });
+  carousel.querySelector("[data-prev]")?.addEventListener("click", () => { show(index - 1); start(); });
+  carousel.addEventListener("mouseenter", stop);
+  carousel.addEventListener("mouseleave", start);
+  carousel.addEventListener("focusin", stop);
+  carousel.addEventListener("focusout", (e) => { if (!carousel.contains(e.relatedTarget)) start(); });
+  start();
+}
+
 // ---- checkout: card formatting, brand, test fill, simulated processing ----
 const cardForm = document.querySelector("[data-card-form]");
 if (cardForm) {
