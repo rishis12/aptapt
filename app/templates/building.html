@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ apt.name }}{% endblock %}
+{% block content %}
+<nav class="crumbs"><a href="{{ url_for('apartments.search', zip=apt.zip) }}">Buildings near {{ apt.zip }}</a></nav>
+
+<section class="gallery{% if photos|length > 1 %} has-thumbs{% endif %}">
+  {% if photos %}
+    <figure class="gallery-main">
+      <img src="{{ url_for('static', filename=photos[0].file) }}" alt="{{ apt.name }}" data-gallery-main>
+      <figcaption data-gallery-credit>{{ photos[0].credit }}</figcaption>
+    </figure>
+    {% if photos|length > 1 %}
+      <div class="gallery-thumbs">
+        {% for p in photos[:4] %}
+          <button type="button" data-gallery-src="{{ url_for('static', filename=p.file) }}" data-gallery-caption="{{ p.credit }}" {% if loop.first %}aria-current="true"{% endif %}>
+            <img src="{{ url_for('static', filename=p.file) }}" alt="" loading="lazy">
+          </button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% else %}
+    {{ ui.photo(apt, photos, 'gallery-main photo-missing-lg') }}
+  {% endif %}
+</section>
+
+<div class="building-layout">
+  <article class="building-info">
+    <h1>{{ apt.name }}</h1>
+    <p class="building-address">{{ apt.address }}, Madison, WI {{ apt.zip }}</p>
+
+    <dl class="facts">
+      <div><dt>Status</dt><dd>{{ apt.status_text or 'Leasing' }}</dd></div>
+      <div><dt>Opens</dt><dd>{{ apt.opening or 'Open now' }}</dd></div>
+      <div><dt>Size</dt><dd>{% if apt.stories %}{{ apt.stories }} stories{% endif %}{% if apt.units %}{% if apt.stories %}, {% endif %}{{ apt.units }} units{% endif %}{% if apt.beds %}, {{ apt.beds }} beds{% endif %}</dd></div>
+      <div><dt>Floor plans</dt><dd>{{ floor_plans|join(', ') or 'Not published' }}</dd></div>
+      <div><dt>Rent</dt><dd>{{ ui.rent(apt) }}{% if apt.rent_is_estimate and apt.rent_min %}<small>Estimated from comparable new buildings</small>{% endif %}</dd></div>
+      <div><dt>Developer</dt><dd>{{ apt.developer or 'Not published' }}</dd></div>
+    </dl>
+
+    <p class="building-desc">{{ apt.description }}</p>
+
+    {% if amenities %}
+      <h2>Amenities</h2>
+      <ul class="amenities">{% for a in amenities %}<li>{{ a }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    <h2>Who manages it</h2>
+    <p>{{ apt.manager_company }} <span class="muted">(a fictional manager for this demo)</span>.
+      {% if apt.agent_user_id %}They're on aptapt, so a committed group can invite them to make an offer.
+      {% else %}They aren't on aptapt yet. A committed group sets its own ask, and when it hits its size, we pitch it to them.{% endif %}
+    </p>
+    {% if apt.website %}<p><a href="{{ apt.website }}" rel="noopener" target="_blank">Official website</a></p>{% endif %}
+
+    <h2>Groups considering {{ apt.name }}</h2>
+    <p class="muted">Free groups where renters compare buildings and decide together before anyone puts money down.</p>
+    <ul class="rows">
+      {% for e in exploratory %}
+        <li>
+          <a href="{{ url_for('groups.show', group_id=e.group.id) }}"><strong>{{ e.group.name }}</strong></a>
+          <span class="muted">{{ e.count }} {{ 'person' if e.count == 1 else 'people' }}{% if e.is_member %}, including you{% endif %}</span>
+          {% if current_user and current_user.role == 'renter' and not e.is_member %}
+            <form method="post" action="{{ url_for('groups.join', group_id=e.group.id) }}">{{ csrf_field() }}<button class="btn btn-quiet btn-small">Join</button></form>
+          {% endif %}
+        </li>
+      {% else %}
+        <li class="muted">No groups have this building on their shortlist yet.</li>
+      {% endfor %}
+    </ul>
+    {% if current_user and current_user.role == 'renter' %}
+      {% if my_other_groups %}
+        <form class="inline-form" method="post" action="{{ url_for('groups.shortlist_add', group_id=my_other_groups[0].id) }}" data-shortlist-form>
+          {{ csrf_field() }}
+          <input type="hidden" name="apartment_id" value="{{ apt.id }}">
+          <input type="hidden" name="back" value="{{ request.path }}">
+          <label class="sr-only" for="shortlist-group">Your group</label>
+          <select id="shortlist-group" data-shortlist-target>
+            {% for grp in my_other_groups %}<option value="{{ url_for('groups.shortlist_add', group_id=grp.id) }}">{{ grp.name }}</option>{% endfor %}
+          </select>
+          <button class="btn btn-quiet">Add to this group's shortlist</button>
+        </form>
+      {% endif %}
+      <form class="inline-form" method="post" action="{{ url_for('apartments.create_group', slug=apt.slug) }}">
+        {{ csrf_field() }}
+        <label class="sr-only" for="new-group">Group name</label>
+        <input id="new-group" name="name" maxlength="60" placeholder="Name a new group, like UW Health nurses">
+        <button class="btn btn-quiet">Start a group</button>
+      </form>
+    {% elif not current_user %}
+      <p><a href="{{ url_for('auth.login', next=request.path) }}">Sign in</a> to join or start a group.</p>
+    {% endif %}
+
+    {% if history %}
+      <h2>Past committed groups</h2>
+      <ul class="rows">
+        {% for h in history %}
+          <li>
+            <a href="{{ url_for('groups.show', group_id=h.group.id) }}">{{ h.group.name }}</a>
+            <span>{{ ui.status(h.group) }}</span>
+            <span class="muted">{{ h.count }} renters{% if h.offer and h.group.status == 'unlocked' %}, {{ h.offer.title }}{% endif %}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </article>
+
+  <aside class="deal-panel">
+    <h2>{{ committed.name if committed else 'Committed group' }}</h2>
+    {% if committed %}
+      {% set target = stats.offer.required_size if stats.offer else invite_threshold %}
+      {{ ui.meter(stats.committed_count, target, 'lg') }}
+      <p class="meter-caption"><strong>{{ stats.committed_count }} of {{ target }}</strong> committed{% if committed.due_at %}. Due in {{ committed.due_at|until|replace(' left', '') }}{% endif %}</p>
+      {% if stats.offer %}{{ ui.terms(stats.offer) }}{% endif %}
+      <p>{{ ui.status(committed) }}</p>
+    {% else %}
+      {{ ui.meter(0, invite_threshold, 'lg') }}
+      <p class="meter-caption">No one has committed yet. Start the first group.</p>
+    {% endif %}
+
+    {% if committed_is_member %}
+      <a class="btn btn-block" href="{{ url_for('groups.show', group_id=committed.id) }}">Open your group</a>
+    {% elif not current_user %}
+      <a class="btn btn-block" href="{{ url_for('auth.signup', next=request.path) }}">Create an account to commit</a>
+    {% elif current_user.role == 'renter' %}
+      <form method="post" action="{{ url_for('apartments.commit', slug=apt.slug) }}">
+        {{ csrf_field() }}<button class="btn btn-block">Commit with a $15 deposit</button>
+      </form>
+    {% endif %}
+    {% if committed and not committed_is_member %}
+      <a class="deal-panel-link" href="{{ url_for('groups.show', group_id=committed.id) }}">See the group first</a>
+    {% endif %}
+    <p class="fine">You get your $15 back when you sign your lease, or if the group misses its due date. Leaving the group forfeits it.</p>
+  </aside>
+</div>
+{% endblock %}

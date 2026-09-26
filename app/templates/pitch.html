@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}A group wants to lease at {{ apt.name }}{% endblock %}
+{% block content %}
+<article class="pitch">
+  <h1>{{ count }} renters want to lease at {{ apt.name }}</h1>
+  <p class="pitch-lede">They've each put down a deposit and committed to sign 12-month leases if you accept their ask. That's {{ count }} units filled in one go.</p>
+
+  {{ ui.meter(count, ask.required_size, 'md', 'unlocked' if count >= ask.required_size else None) }}
+  {{ ui.terms(ask) }}
+
+  <dl class="facts">
+    <div><dt>Group</dt><dd>{{ group.name }}</dd></div>
+    <div><dt>Committed renters</dt><dd>{{ count }}</dd></div>
+    <div><dt>Sent</dt><dd>{{ pitch.sent_at|date }}</dd></div>
+    <div><dt>Respond by</dt><dd>{{ pitch.respond_by|date }}</dd></div>
+  </dl>
+
+  {% if pitch.status != 'sent' %}
+    <p class="callout">This pitch has already been answered ({{ pitch.status }}).</p>
+  {% elif not current_user or current_user.role != 'agent' %}
+    <p class="callout callout-lit">To respond, create a free leasing office account for {{ apt.manager_company }}. Responding connects you to this building on aptapt.</p>
+    <a class="btn" href="{{ url_for('auth.signup', role='agent', next=request.path) }}">Create a leasing office account</a>
+    <a href="{{ url_for('auth.login', role='agent', next=request.path) }}">Sign in</a>
+  {% else %}
+    <div class="pitch-actions">
+      <form method="post">
+        {{ csrf_field() }}
+        <button class="btn" name="action" value="accept">Accept the ask</button>
+      </form>
+      <details class="ask-form">
+        <summary>Counter with different terms</summary>
+        <form method="post" class="stack">
+          {{ csrf_field() }}
+          <input type="hidden" name="action" value="counter">
+          <label>Incentive <select name="incentive_type">{% for k, v in incentive_types.items() %}<option value="{{ k }}" {% if ask.incentive_type == k %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></label>
+          <label>Headline <input name="title" required maxlength="80" placeholder="Waived fees, no rent discount"></label>
+          <label>Details (optional) <textarea name="details" rows="2"></textarea></label>
+          <label>Group size needed <input name="required_size" type="number" min="2" max="200" required value="{{ ask.required_size }}"></label>
+          <button class="btn btn-quiet">Send counter-offer</button>
+        </form>
+      </details>
+      <form method="post" data-confirm="Decline this group's ask?">
+        {{ csrf_field() }}<button class="linklike danger" name="action" value="decline">Decline</button>
+      </form>
+    </div>
+  {% endif %}
+</article>
+{% endblock %}

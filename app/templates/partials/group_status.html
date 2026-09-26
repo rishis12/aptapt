@@ -1,0 +1,242 @@
+{% import "_ui.html" as ui with context %}
+{% set animate = not request.headers.get('HX-Request') %}
+<div id="group-status" class="group-status" hx-get="{{ url_for('groups.status', group_id=group.id) }}" hx-trigger="every 3s" hx-swap="outerHTML">
+<section class="panel panel-deal">
+  <div class="panel-head">
+    <h2>{{ 'The deal' if group.kind == 'committed' else 'Shortlist' }}</h2>
+    {{ ui.status(group, deal) }}
+  </div>
+
+{% if group.kind == 'committed' %}
+
+  {% if deal %}
+    {% set dc = deal_counts %}
+    {{ ui.meter(dc.signed + dc.reserved, offer.required_size, 'lg', 'unlocked', animate) }}
+    <p class="meter-caption"><strong>{{ dc.signed }} signed, {{ dc.reserved }} reserved</strong> of {{ offer.required_size }} needed{% if dc.pending %}. {{ dc.pending }} still to reserve{% endif %}</p>
+    {{ ui.terms(offer) }}
+
+    {% if deal.status == 'reserving' %}
+      <p class="callout callout-green">
+        {% if deal.extended %}Extended.{% else %}Deal unlocked.{% endif %}
+        Reservations close {{ deal.window_ends_at|date('%a %b %-d at %-I:%M %p') }} ({{ deal.window_ends_at|until }}).
+        {% if deal.extended %} New renters can still commit to fill open spots.{% endif %}
+      </p>
+    {% elif deal.status == 'short' %}
+      <p class="callout callout-red">The reservation window closed with fewer renters than the offer needed. {{ apt.manager_company }} is deciding whether to honor the deal, extend it, or cancel it. If they cancel, every deposit is refunded.</p>
+    {% elif deal.status == 'closed' %}
+      <p class="callout callout-green">Deal closed. {{ dc.signed }} leases signed at {{ apt.name }}.</p>
+    {% elif deal.status == 'cancelled' %}
+      <p class="callout callout-red">The leasing office cancelled this deal. All deposits were refunded.</p>
+    {% endif %}
+
+    {% if my_deal and my_deal.status != 'dropped' %}
+      <ol class="checklist">
+        <li class="{{ 'done' if my_deal.status in ('reserved', 'signed') else 'current' }}">
+          <div>
+            <h3>Reserve your unit</h3>
+            {% if my_deal.status in ('reserved', 'signed') %}
+              <p>{{ my_deal.floor_plan }}{% if my_deal.move_in %}, moving in {{ my_deal.move_in|date }}{% endif %}. $250 holding deposit paid.</p>
+            {% else %}
+              <p>Pick a floor plan, fill out the application, and pay a $250 holding deposit.</p>
+            {% endif %}
+          </div>
+          {% if my_deal.status == 'pending' and deal.status == 'reserving' %}
+            <form method="post" action="{{ url_for('groups.reserve', group_id=group.id) }}">{{ csrf_field() }}<button class="btn">Reserve</button></form>
+          {% endif %}
+        </li>
+        <li class="{{ 'done' if my_deal.status == 'signed' else ('current' if my_deal.status == 'reserved' else '') }}">
+          <div>
+            <h3>Sign your lease</h3>
+            <p>{% if my_deal.status == 'signed' %}Signed {{ my_deal.signed_at|date }}. Your $15 commitment deposit was refunded.{% else %}Review the terms and sign. Your $15 comes back when you do.{% endif %}</p>
+          </div>
+          {% if my_deal.status == 'reserved' %}<a class="btn" href="{{ url_for('groups.sign', group_id=group.id) }}">Sign lease</a>{% endif %}
+        </li>
+      </ol>
+      {% if my_deal.status in ('pending', 'reserved') and deal.status in ('reserving', 'short') %}
+        <form method="post" action="{{ url_for('groups.leave', group_id=group.id) }}" data-confirm="Back out of the deal? You'll forfeit your $15 commitment deposit.">
+          {{ csrf_field() }}<button class="linklike danger">Back out of the deal</button>
+        </form>
+      {% endif %}
+    {% elif my_deal and my_deal.status == 'dropped' %}
+      <p class="callout">You're no longer part of this deal.</p>
+    {% endif %}
+
+  {% elif group.status == 'expired' %}
+    {{ ui.meter(count, target, 'lg', None, animate) }}
+    <p class="callout">This group reached its due date without unlocking a deal. Everyone's $15 deposit was refunded.</p>
+
+  {% else %}
+    {{ ui.meter(count, target, 'lg', None, animate) }}
+    <p class="meter-caption"><strong>{{ count }} of {{ target }}</strong> committed.
+      {% if offer %}{% if needed %}{{ needed }} more to {{ 'unlock the deal' if offer.source == 'agent' else 'send the pitch' }}.{% endif %}
+      {% elif manager_on_aptapt %}{% if needed %}{{ needed }} more to invite the leasing office.{% else %}Ready to invite the leasing office.{% endif %}{% endif %}
+      Due {{ group.due_at|date }} ({{ group.due_at|until }}).
+    </p>
+
+    {% if counter %}
+      <div class="callout callout-lit">
+        <p><strong>{{ apt.contact_name }} countered your ask.</strong> Vote by {{ pitch.vote_ends_at|date('%a %b %-d, %-I:%M %p') }}. Anyone who rejects, or doesn't vote, is released from the group with a full refund.</p>
+      </div>
+      {{ ui.terms(counter) }}
+      <p class="meter-caption">{{ counter.required_size }} renters needed. So far {{ tally.accept }} accepted, {{ tally.reject }} rejected.</p>
+      {% if is_member %}
+        <form class="vote" method="post" action="{{ url_for('groups.vote', group_id=group.id) }}">
+          {{ csrf_field() }}
+          <button class="btn{% if my_vote == 'accept' %} is-chosen{% endif %}" name="choice" value="accept">Accept counter</button>
+          <button class="btn btn-quiet{% if my_vote == 'reject' %} is-chosen{% endif %}" name="choice" value="reject">Reject and get refunded</button>
+        </form>
+        {% if my_vote %}<p class="fine">You voted to {{ my_vote }}. You can change your vote until it closes.</p>{% endif %}
+      {% endif %}
+
+    {% elif pitch %}
+      {{ ui.terms(offer) }}
+      <p class="callout callout-lit">We pitched this ask to {{ pitch.to_name }} at {{ apt.manager_company }} on {{ pitch.sent_at|date }}. They have until {{ pitch.respond_by|date }} ({{ pitch.respond_by|until }}) to accept, counter, or decline. <a href="{{ url_for('pitch.email', token=pitch.token) }}">See the email we sent</a>.</p>
+
+    {% elif offer %}
+      {{ ui.terms(offer) }}
+      {% if offer.source == 'group' %}<p class="fine">{{ apt.manager_company }} isn't on aptapt. When {{ offer.required_size }} renters commit, we'll send them this ask.</p>{% endif %}
+
+    {% elif group.status == 'agent_invited' %}
+      <p class="callout callout-lit">The leasing office at {{ apt.manager_company }} has been invited. Keep recruiting while they put an offer together. Bigger groups get better offers.</p>
+
+    {% elif not manager_on_aptapt %}
+      <p class="callout">{{ apt.manager_company }} isn't on aptapt yet. Decide what the group wants, and we'll pitch it to them once enough people commit.</p>
+    {% endif %}
+
+    {# Actions #}
+    {% if is_member and group.status == 'forming' and manager_on_aptapt %}
+      <form method="post" action="{{ url_for('groups.invite_agent', group_id=group.id) }}">
+        {{ csrf_field() }}
+        <button class="btn" {% if count < threshold %}disabled{% endif %}>Invite the leasing office</button>
+        {% if count < threshold %}<span class="fine">Unlocks at {{ threshold }} committed renters</span>{% endif %}
+      </form>
+    {% endif %}
+
+    {% if is_member and group.status == 'forming' and not manager_on_aptapt %}
+      <details class="ask-form" data-keep {% if not offer %}open{% endif %}>
+        <summary>{{ 'Change the group\'s ask' if offer else 'Set the group\'s ask' }}</summary>
+        <form method="post" action="{{ url_for('groups.set_ask', group_id=group.id) }}" class="stack">
+          {{ csrf_field() }}
+          <label>What you're asking for
+            <select name="incentive_type">{% for k, v in incentive_types.items() %}<option value="{{ k }}" {% if offer and offer.incentive_type == k %}selected{% endif %}>{{ v }}</option>{% endfor %}</select>
+          </label>
+          <label>In one line
+            <input name="title" maxlength="80" required value="{{ offer.title if offer else '' }}" placeholder="$100 off monthly rent for a year">
+          </label>
+          <label>Details (optional)
+            <textarea name="details" rows="2">{{ offer.details if offer else '' }}</textarea>
+          </label>
+          <label>Pitch it when this many have committed
+            <input name="required_size" type="number" min="2" max="200" required value="{{ offer.required_size if offer else [count + 3, 5]|max }}">
+          </label>
+          <button class="btn">Save the ask</button>
+        </form>
+      </details>
+    {% endif %}
+  {% endif %}
+
+  {# Joining #}
+  {% if commit_open %}
+    <form method="post" action="{{ url_for('groups.join', group_id=group.id) }}">
+      {{ csrf_field() }}<button class="btn btn-block">Commit with a $15 deposit</button>
+    </form>
+    <p class="fine">Refunded when you sign your lease, or if the group misses its due date. Leaving forfeits it.</p>
+  {% elif not current_user and group.status not in ('unlocked', 'expired') %}
+    <a class="btn btn-block" href="{{ url_for('auth.signup', next=url_for('groups.show', group_id=group.id)) }}">Create an account to commit</a>
+  {% endif %}
+
+  {% if next_group %}
+    <p><a href="{{ url_for('groups.show', group_id=next_group.id) }}">{{ next_group.name }} is forming now</a></p>
+  {% endif %}
+
+  {% if is_member and not deal and group.status in ('forming', 'agent_invited', 'offer_active', 'pitch_sent') %}
+    <div class="member-foot">
+      {% if my_deposit %}<p class="fine">Your $15 deposit is held on {{ my_deposit.card_brand }} ending {{ my_deposit.card_last4 }}.</p>{% endif %}
+      <form method="post" action="{{ url_for('groups.leave', group_id=group.id) }}" data-confirm="Leave the group? You'll forfeit your $15 deposit.">
+        {{ csrf_field() }}<button class="linklike danger">Leave group and forfeit $15</button>
+      </form>
+    </div>
+  {% endif %}
+
+{% else %}
+
+  <p class="muted">Keep a shortlist of buildings and talk it through. When you agree on one, each of you commits there with a $15 deposit and joins that building's committed group.</p>
+
+  {% if shortlist %}
+    <ul class="shortlist">
+      {% for item in shortlist %}
+        {% set a, st = item.apt, item.stats %}
+        {% set mine = current_user and (item.ours|selectattr('id', 'equalto', current_user.id)|list) %}
+        <li>
+          <a href="{{ url_for('apartments.detail', slug=a.slug) }}">{{ ui.photo(a, a.photos|fromjson, 'shortlist-photo') }}</a>
+          <div class="shortlist-main">
+            <h3><a href="{{ url_for('apartments.detail', slug=a.slug) }}">{{ a.name }}</a></h3>
+            <p class="muted">{{ ui.rent(a) }}. Opens {{ a.opening or 'now' }}.</p>
+            <div class="shortlist-meter">
+              {{ ui.meter(st.committed_count, st.offer.required_size if st.offer else invite_threshold, 'xs', animate=False) }}
+              <p>{{ st.committed_count }} committed{% if st.offer %} of {{ st.offer.required_size }}{% endif %}{% if item.ours %}, <strong>{{ item.ours|length }} from this group</strong> ({{ item.ours|map(attribute='name')|map('first_name')|join(', ') }}){% endif %}</p>
+            </div>
+            {% if st.offer %}<p class="shortlist-offer">{{ st.offer.title }}</p>{% endif %}
+          </div>
+          <div class="shortlist-act">
+            {% if mine %}
+              <a class="btn btn-quiet btn-small" href="{{ url_for('groups.show', group_id=st.committed_group.id) }}">You're committed</a>
+            {% elif is_member %}
+              <form method="post" action="{{ url_for('apartments.commit', slug=a.slug) }}">{{ csrf_field() }}<button class="btn btn-small">Commit here</button></form>
+            {% endif %}
+            {% if is_member %}
+              <form method="post" action="{{ url_for('groups.shortlist_remove', group_id=group.id, apartment_id=a.id) }}">{{ csrf_field() }}<button class="linklike">Remove</button></form>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty">No buildings on the shortlist yet.</p>
+  {% endif %}
+
+  {% if is_member and addable %}
+    <form class="inline-form" method="post" action="{{ url_for('groups.shortlist_add', group_id=group.id) }}">
+      {{ csrf_field() }}
+      <label class="sr-only" for="add-building">Building</label>
+      <select id="add-building" name="apartment_id">{% for a in addable %}<option value="{{ a.id }}">{{ a.name }}</option>{% endfor %}</select>
+      <button class="btn btn-quiet">Add to shortlist</button>
+    </form>
+  {% endif %}
+
+  <div class="actions">
+    {% if current_user and current_user.role == 'renter' %}
+      {% if is_member %}
+        <form method="post" action="{{ url_for('groups.leave', group_id=group.id) }}">{{ csrf_field() }}<button class="linklike">Leave group</button></form>
+      {% else %}
+        <form method="post" action="{{ url_for('groups.join', group_id=group.id) }}">{{ csrf_field() }}<button class="btn">Join the group, free</button></form>
+      {% endif %}
+    {% elif not current_user %}
+      <a class="btn" href="{{ url_for('auth.signup', next=url_for('groups.show', group_id=group.id)) }}">Create an account to join</a>
+    {% endif %}
+  </div>
+
+{% endif %}
+
+  {% if friend_invite %}
+    {{ ui.copy_link(url_for('groups.invite', token=friend_invite, _external=True), 'Invite friends') }}
+  {% endif %}
+  {% if agent_invite and group.status == 'agent_invited' and is_member %}
+    {{ ui.copy_link(url_for('groups.invite', token=agent_invite, _external=True), 'Link for the leasing office') }}
+  {% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-head"><h2>Members</h2><span class="muted">{{ count }}</span></div>
+  <ul class="people">
+    {% for u in members %}
+      {% set dm = (roster|selectattr('user_id', 'equalto', u.id)|first) if roster else None %}
+      <li class="{% if current_user and u.id == current_user.id %}is-me{% endif %}">
+        <span class="avatar" style="--h: {{ (u.id * 71) % 360 }}">{{ u.name|initials }}</span>
+        <span>{{ u.name }}{% if current_user and u.id == current_user.id %} (you){% endif %}</span>
+        {% if dm %}<span class="people-step step-{{ dm.status }}">{{ {'pending': 'Not reserved', 'reserved': 'Reserved', 'signed': 'Signed', 'dropped': 'Dropped'}[dm.status] }}</span>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+</div>

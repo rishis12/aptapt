@@ -1,0 +1,61 @@
+{# Window meter: the building facade. Each committed renter lights one window. #}
+{% macro meter(count, target, size='lg', status=None, animate=True) -%}
+  {% set target = [target or 1, 1]|max %}
+  {# Pick a column count that fills every floor evenly when possible. #}
+  {% set cols = target if target <= 6 else ((((5, 4, 6, 3, 8, 7)|select('divisibleby_target', target)|list) or [10 if target > 20 else 5])[0]) %}
+  {% set lit = [count, target]|min %}
+  <div class="facade facade-{{ size }}{% if status == 'unlocked' %} is-unlocked{% endif %}{% if animate %} is-animated{% endif %}"
+       style="--cols: {{ cols }}" role="img" aria-label="{{ count }} of {{ target }} committed">
+    <div class="facade-roof"></div>
+    <div class="facade-grid">
+      {% for i in range(target) %}<span class="win{% if i < lit %} on{% endif %}" style="--i: {{ i }}"></span>{% endfor %}
+    </div>
+  </div>
+{%- endmacro %}
+
+{% macro status(group, deal=None) -%}
+  {% set s = group.status %}
+  {% if deal and deal.status == 'closed' %}{% set label, tone = 'Deal closed', 'green' %}
+  {% elif deal and deal.status == 'cancelled' %}{% set label, tone = 'Deal cancelled', 'red' %}
+  {% elif deal and deal.status == 'short' %}{% set label, tone = 'Short of target', 'red' %}
+  {% elif deal %}{% set label, tone = 'Reserving', 'green' %}
+  {% else %}
+    {% set label, tone = {
+      'open': ('Exploring', 'slate'), 'forming': ('Forming', 'slate'), 'agent_invited': ('Waiting on leasing office', 'lit'),
+      'offer_active': ('Offer on the table', 'lit'), 'pitch_sent': ('Pitched to manager', 'lit'),
+      'unlocked': ('Unlocked', 'green'), 'expired': ('Expired', 'red'),
+    }[s] %}
+  {% endif %}
+  <span class="status status-{{ tone }}"><i></i>{{ label }}</span>
+{%- endmacro %}
+
+{% macro terms(offer) -%}
+  <div class="terms{% if offer.status == 'accepted' %} is-accepted{% endif %}">
+    <p class="terms-kind">{{ incentive_types.get(offer.incentive_type, 'Offer') }}{% if offer.source == 'group' and offer.status != 'accepted' %}, the group's ask{% endif %}</p>
+    <p class="terms-title">{{ offer.title }}</p>
+    {% if offer.details %}<p class="terms-details">{{ offer.details }}</p>{% endif %}
+  </div>
+{%- endmacro %}
+
+{% macro copy_link(url, label) -%}
+  <div class="copy-link">
+    <label>{{ label }}</label>
+    <div class="copy-row">
+      <input type="text" readonly value="{{ url }}" onclick="this.select()">
+      <button type="button" class="btn btn-quiet" data-copy="{{ url }}">Copy</button>
+    </div>
+  </div>
+{%- endmacro %}
+
+{% macro photo(apt, photos, cls='', eager=False) -%}
+  {% if photos %}
+    <img class="{{ cls }}" src="{{ url_for('static', filename=photos[0].file) }}" alt="{{ apt.name }}, {{ apt.address }}"
+         {% if not eager %}loading="lazy"{% endif %}>
+  {% else %}
+    <div class="{{ cls }} photo-missing"><span>{{ apt.name }}</span></div>
+  {% endif %}
+{%- endmacro %}
+
+{% macro rent(apt) -%}
+  {% if apt.rent_min %}{{ apt.rent_min|money }}{% if apt.rent_max and apt.rent_max != apt.rent_min %}–{{ apt.rent_max|money }}{% endif %}{% if apt.leasing == 'per_bed' %} per bed{% endif %}{% else %}Pricing not published{% endif %}
+{%- endmacro %}

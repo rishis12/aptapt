@@ -1,0 +1,13 @@
+{% extends "auth/_layout.html" %}
+{% block title %}Sign in{% endblock %}
+{% block form %}
+<h1>Sign in</h1>
+<form method="post" class="stack">
+  {{ csrf_field() }}
+  <input type="hidden" name="next" value="{{ next }}">
+  <label>Email <input name="email" type="email" required autocomplete="email" value="{{ email }}" autofocus></label>
+  <label>Password <input name="password" type="password" required autocomplete="current-password"></label>
+  <button class="btn btn-block">Sign in</button>
+</form>
+<p>New to aptapt? <a href="{{ url_for('auth.signup', next=next, role=role) }}">Create an account</a></p>
+{% endblock %}

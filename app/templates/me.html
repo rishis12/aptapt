@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Your groups{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Your groups</h1>
+  <form class="inline-form" method="post" action="{{ url_for('groups.create') }}">
+    {{ csrf_field() }}
+    <label class="sr-only" for="group-name">Group name</label>
+    <input id="group-name" name="name" maxlength="60" placeholder="Name a group, like Sellery friends" required>
+    <button class="btn">Start a group</button>
+  </form>
+</div>
+{% if items %}
+  <ul class="rows rows-lg">
+    {% for it in items %}
+      <li>
+        <a href="{{ url_for('groups.show', group_id=it.group.id) }}"><strong>{{ it.group.name }}</strong></a>
+        {% if it.group.kind == 'committed' %}
+          <span>{{ it.group.apartment_name }}</span>
+          <span>{{ ui.status(it.group) }}</span>
+          <span class="muted">{{ it.count }} committed{% if it.offer %}, {{ it.offer.title }}{% endif %}</span>
+        {% else %}
+          <span>{{ it.shortlist|join(', ') if it.shortlist else 'No buildings shortlisted' }}</span>
+          <span class="muted">{{ it.count }} {{ 'member' if it.count == 1 else 'members' }}, free group</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="empty">You're not in any groups yet. <a href="{{ url_for('apartments.search') }}">Browse buildings</a> to find one.</p>
+{% endif %}
+
+<h2 class="section-gap">Deposits</h2>
+<p class="muted">Simulated in test mode. Nothing is ever charged.</p>
+{% if ledger %}
+  <table class="table">
+    <thead><tr><th>Date</th><th>For</th><th>Type</th><th class="num">Amount</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for d in ledger %}
+        <tr>
+          <td>{{ d.created_at|date }}</td>
+          <td>{{ d.apartment_name }}, {{ d.group_name }}</td>
+          <td>{{ 'Commitment' if d.kind == 'commitment' else 'Holding' }}</td>
+          <td class="num">{{ d.amount_cents|cents }}</td>
+          <td><span class="ledger-{{ d.status }}">{{ {'held': 'Held', 'refunded': 'Refunded', 'forfeited': 'Forfeited', 'applied': 'Applied to rent'}[d.status] }}</span>{% if d.reason %}<small>{{ d.reason }}</small>{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="empty">No deposits yet.</p>
+{% endif %}
+{% endblock %}

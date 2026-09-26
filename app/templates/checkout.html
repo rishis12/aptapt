@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ 'Commit to ' if co.purpose == 'commitment' else 'Reserve at ' }}{{ apt.name }}{% endblock %}
+{% block body_class %}is-checkout{% endblock %}
+{% block header %}
+<div class="test-mode">Test mode. Nothing is charged. Pay with card 4242 4242 4242 4242, any future date, any CVC.</div>
+<header class="checkout-header">
+  <a class="wordmark" href="{{ url_for('groups.show', group_id=group.id) }}"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>aptapt</a>
+  <a href="{{ url_for('groups.show', group_id=group.id) }}">Cancel and return to {{ group.name }}</a>
+</header>
+{% endblock %}
+{% block footer %}{% endblock %}
+{% block flashes %}{% endblock %}
+{% block main_class %}checkout{% endblock %}
+{% block content %}
+<section class="order">
+  {{ ui.photo(apt, photos, 'order-photo') }}
+  <p class="order-for">{{ apt.name }}, {{ group.name }}</p>
+  <p class="order-amount">{{ co.amount_cents|cents }}</p>
+  <p class="order-what">{{ 'Commitment deposit' if co.purpose == 'commitment' else 'Holding deposit' }}</p>
+  <dl class="order-lines">
+    {% if co.purpose == 'commitment' %}
+      <div><dt>Commitment deposit</dt><dd>{{ co.amount_cents|cents }}</dd></div>
+      <div><dt>Refunded if</dt><dd>You sign your lease, or the group misses its due date ({{ group.due_at|date }})</dd></div>
+      <div><dt>Forfeited if</dt><dd>You leave the group, or don't reserve once the deal unlocks</dd></div>
+    {% else %}
+      <div><dt>Holding deposit</dt><dd>{{ co.amount_cents|cents }}</dd></div>
+      {% if co.floor_plan %}<div><dt>Floor plan</dt><dd>{{ co.floor_plan }}</dd></div>{% endif %}
+      {% if co.move_in %}<div><dt>Move-in</dt><dd>{{ co.move_in|date }}</dd></div>{% endif %}
+      <div><dt>Applied to</dt><dd>Your first month's rent when you sign</dd></div>
+    {% endif %}
+    {% if offer %}<div><dt>Group deal</dt><dd>{{ offer.title }}</dd></div>{% endif %}
+  </dl>
+</section>
+
+<section class="pay">
+  {% if co.purpose == 'holding' %}
+    <ol class="steps" aria-label="Reservation steps">
+      {% for key, label in (('plan', 'Unit'), ('application', 'Application'), ('pay', 'Payment')) %}
+        <li class="{% if co.step == key %}is-current{% elif loop.index0 < ['plan', 'application', 'pay'].index(co.step) %}is-done{% endif %}">{{ label }}</li>
+      {% endfor %}
+    </ol>
+  {% endif %}
+
+  {% with messages = get_flashed_messages(category_filter=['error']) %}
+    {% for m in messages %}<p class="form-error" role="alert">{{ m }}</p>{% endfor %}
+  {% endwith %}
+  {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+
+  {% if verifying %}
+    <div class="verify">
+      <h1>Confirm this payment</h1>
+      <p>Your bank wants to confirm a {{ co.amount_cents|cents }} payment to aptapt with {{ co.card_brand }} ending {{ co.card_last4 }}.</p>
+      <p class="fine">This is the simulated bank check that some cards trigger. Choose what the bank does.</p>
+      <form method="post" action="{{ url_for('checkout.verify', token=co.token) }}" class="actions">
+        {{ csrf_field() }}
+        <button class="btn" name="decision" value="approve">Approve payment</button>
+        <button class="btn btn-quiet" name="decision" value="fail">Fail verification</button>
+      </form>
+    </div>
+
+  {% elif co.step == 'plan' %}
+    <h1>Choose your unit</h1>
+    <p class="muted">Your group's deal applies to every floor plan. The leasing office confirms the exact unit when you sign.</p>
+    <form method="post" action="{{ url_for('checkout.plan', token=co.token) }}" class="stack">
+      {{ csrf_field() }}
+      <fieldset class="plans">
+        <legend>Floor plan</legend>
+        {% for p in floor_plans or ['1BR'] %}
+          <label class="plan"><input type="radio" name="floor_plan" value="{{ p }}" {% if co.floor_plan == p or (not co.floor_plan and loop.first) %}checked{% endif %}><span>{{ p }}</span></label>
+        {% endfor %}
+      </fieldset>
+      <label>Move-in date
+        <input type="date" name="move_in" required min="{{ earliest.isoformat() }}" value="{{ co.move_in or earliest.isoformat() }}">
+      </label>
+      {% if apt.opening %}<p class="fine">{{ apt.name }} opens {{ apt.opening }}. Move-in dates start then.</p>{% endif %}
+      <button class="btn btn-block">Continue to application</button>
+    </form>
+
+  {% elif co.step == 'application' %}
+    <h1>Rental application</h1>
+    <p class="muted">This is a demo, so use made-up details. We check the format and then throw it away. Nothing you type here is saved.</p>
+    <form method="post" action="{{ url_for('checkout.application', token=co.token) }}" class="stack" autocomplete="off">
+      {{ csrf_field() }}
+      <label>Full legal name <input name="legal_name" required value="{{ current_user.name }}"></label>
+      <div class="two">
+        <label>Date of birth <input name="dob" type="date" required></label>
+        <label>SSN, last 4 digits <input name="ssn_last4" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="0000" required></label>
+      </div>
+      <label>Current address <input name="current_address" required placeholder="123 Fake St, Madison, WI"></label>
+      <div class="two">
+        <label>Monthly income <input name="monthly_income" inputmode="numeric" required placeholder="4,500"></label>
+        <label>Employer or school <input name="employer" placeholder="UW–Madison"></label>
+      </div>
+      <label class="check"><input type="checkbox" name="consent" required> I authorize {{ apt.manager_company }} to run a credit and background check. (Simulated. No check is run.)</label>
+      <div class="actions">
+        <button class="btn">Continue to payment</button>
+      </div>
+    </form>
+    <form method="post" action="{{ url_for('checkout.back', token=co.token) }}">{{ csrf_field() }}<button class="linklike">Back</button></form>
+
+  {% else %}
+    <h1>{{ 'Pay your commitment deposit' if co.purpose == 'commitment' else 'Pay your holding deposit' }}</h1>
+    <form method="post" action="{{ url_for('checkout.pay', token=co.token) }}" class="card-form" data-card-form autocomplete="off">
+      {{ csrf_field() }}
+      <label>Card number
+        <span class="card-number">
+          <input name="number" inputmode="numeric" autocomplete="off" placeholder="1234 1234 1234 1234" required data-card-number>
+          <span class="card-brand" data-card-brand></span>
+        </span>
+      </label>
+      <div class="three">
+        <label>Expiry <input name="exp" placeholder="MM/YY" required value="{{ card.exp if card else '' }}" data-card-exp></label>
+        <label>CVC <input name="cvc" inputmode="numeric" maxlength="4" placeholder="123" required></label>
+        <label>ZIP <input name="postal" inputmode="numeric" maxlength="5" placeholder="53703" required value="{{ card.postal if card else '' }}"></label>
+      </div>
+      <button class="btn btn-block btn-pay" data-pay>Pay {{ co.amount_cents|cents }}</button>
+      <button type="button" class="linklike" data-fill-test>Fill in the test card</button>
+      <details class="test-cards">
+        <summary>Other test cards</summary>
+        <ul>
+          <li><code>4242 4242 4242 4242</code> pays right away</li>
+          <li><code>4000 0027 6000 3184</code> asks your bank to confirm</li>
+          <li><code>4000 0000 0000 0002</code> is declined</li>
+        </ul>
+      </details>
+    </form>
+    {% if co.purpose == 'holding' %}
+      <form method="post" action="{{ url_for('checkout.back', token=co.token) }}">{{ csrf_field() }}<button class="linklike">Back</button></form>
+    {% endif %}
+    <p class="fine">Real card numbers are rejected. aptapt stores only the card brand and last 4 digits.</p>
+  {% endif %}
+</section>
+{% endblock %}

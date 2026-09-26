@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Sign your lease{% endblock %}
+{% block content %}
+<nav class="crumbs"><a href="{{ url_for('groups.show', group_id=group.id) }}">{{ group.name }}</a></nav>
+<article class="lease">
+  <h1>Residential lease</h1>
+  <p class="muted">Simulated for this demo. It isn't a legal document.</p>
+  <dl class="lease-terms">
+    <div><dt>Property</dt><dd>{{ apt.name }}, {{ apt.address }}, Madison, WI {{ apt.zip }}</dd></div>
+    <div><dt>Landlord</dt><dd>{{ apt.manager_company }}</dd></div>
+    <div><dt>Tenant</dt><dd>{{ current_user.name }}</dd></div>
+    <div><dt>Unit type</dt><dd>{{ my_deal.floor_plan }}</dd></div>
+    {% if my_deal.move_in %}<div><dt>Start date</dt><dd>{{ my_deal.move_in|date('%B %-d, %Y') }}</dd></div>{% endif %}
+    <div><dt>Term</dt><dd>12 months</dd></div>
+    <div><dt>Group incentive</dt><dd>{{ offer.title }}{% if offer.details %}. {{ offer.details }}{% endif %}</dd></div>
+    <div><dt>Deposits</dt><dd>$250 holding deposit applied to month one. $15 aptapt commitment refunded on signing.</dd></div>
+  </dl>
+  <form method="post" class="signature" autocomplete="off">
+    {{ csrf_field() }}
+    <label for="sig">Type your full name to sign</label>
+    <input id="sig" name="signature" required placeholder="{{ current_user.name }}" data-signature>
+    <p class="signature-preview" data-signature-preview aria-hidden="true"></p>
+    <button class="btn">Sign lease</button>
+  </form>
+</article>
+{% endblock %}

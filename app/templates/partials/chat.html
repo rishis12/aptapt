@@ -1,0 +1,23 @@
+<section class="panel chat">
+  <div class="panel-head">
+    <h2>Group chat</h2>
+    <span class="live" title="Updates every few seconds">Live</span>
+  </div>
+  {% include "partials/feed.html" %}
+  {% if can_chat %}
+    <form class="chat-form" method="post" action="{{ url_for('groups.post_message', group_id=group.id) }}"
+          hx-post="{{ url_for('groups.post_message', group_id=group.id) }}" hx-target="#feed" hx-swap="outerHTML"
+          hx-on::after-request="if (event.detail.successful) this.reset()">
+      {{ csrf_field() }}
+      <input type="hidden" name="back" value="{{ request.path }}">
+      <label class="sr-only" for="chat-body">Message</label>
+      <input id="chat-body" name="body" maxlength="1000" autocomplete="off" required
+             placeholder="{{ 'Reply as the leasing office' if is_agent else 'Write to the group' }}">
+      <button class="btn">Send</button>
+    </form>
+  {% elif current_user %}
+    <p class="muted">Join the group to chat.</p>
+  {% else %}
+    <p class="muted"><a href="{{ url_for('auth.login', next=request.path) }}">Sign in</a> and join to chat.</p>
+  {% endif %}
+</section>

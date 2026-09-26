@@ -1,0 +1,282 @@
+[
+  {
+    "slug": "seven20",
+    "name": "Seven20",
+    "address": "720 E Washington Ave, Madison, WI",
+    "zip": "53703",
+    "neighborhood": "Capitol East",
+    "lat": 43.0799776,
+    "lng": -89.3763712,
+    "kind": "market",
+    "leasing": "per_unit",
+    "stories": 14,
+    "units": 244,
+    "beds": null,
+    "developer": "Willow Partners",
+    "opening": "May 2027",
+    "status": "Pre-leasing",
+    "floor_plans": [
+      "Studio",
+      "1BR",
+      "2BR",
+      "3BR"
+    ],
+    "rent_min": 1500,
+    "rent_max": 4200,
+    "rent_is_estimate": true,
+    "amenities": [
+      "Third-floor terrace pool",
+      "Top-floor sky lounge and deck",
+      "24/7 fitness with sauna and cold plunge",
+      "Golf simulator",
+      "Movie theater",
+      "Pet spa",
+      "Co-working space",
+      "Heated garage parking"
+    ],
+    "description": "A 14-story high-rise on the Capitol East stretch of East Washington Avenue, with studios through three-bedroom apartments above a base of street-level shops and restaurants. The building leans heavily on shared amenities, including a pool deck on the third floor and a lounge at the top of the tower.",
+    "website": "https://www.liveseven20.com/",
+    "sources": [
+      "https://www.liveseven20.com/",
+      "https://jla-ap.com/project/702-east-washington/"
+    ],
+    "notes": "Rents are not published on liveseven20.com; the estimate is based on new Capitol East luxury high-rises (e.g., The Eastern, Lyric, Verve) at roughly $1,500 for a studio to $4,000+ for a 3BR. JLA lists the project as '702 East Washington' but the property site uses 720 E Washington Ave. JLA says the unit mix includes some affordable units, plus 13,000+ sq ft of retail. Geocoded with a postal-code-restricted Nominatim query (an unrestricted query returned a wrong match in 53714).",
+    "photos": [
+      {
+        "file": "img/buildings/seven20/1.jpg",
+        "credit": "Rendering: JLA Architects / Willow Partners",
+        "source_url": "https://jla-ap.com/wp-content/uploads/01042023-702-Wash_Dusk-1-alt.jpg"
+      },
+      {
+        "file": "img/buildings/seven20/2.jpg",
+        "credit": "Rendering: JLA Architects / Willow Partners",
+        "source_url": "https://jla-ap.com/wp-content/uploads/01042023-702-Wash_Day-1.jpg"
+      },
+      {
+        "file": "img/buildings/seven20/3.jpg",
+        "credit": "Rendering: JLA Architects / Willow Partners",
+        "source_url": "https://jla-ap.com/wp-content/uploads/120523-702-WASH_day-2.jpg"
+      }
+    ]
+  },
+  {
+    "slug": "the-bella",
+    "name": "The Bella",
+    "address": "117-125 N Butler St, Madison, WI",
+    "zip": "53703",
+    "neighborhood": "James Madison Park",
+    "lat": 43.0783349,
+    "lng": -89.3828788,
+    "kind": "market",
+    "leasing": "per_unit",
+    "stories": 5,
+    "units": 73,
+    "beds": null,
+    "developer": "Fisher Apartments (Cliff Fisher; owner entity Bella On Butler LLC)",
+    "opening": "2027",
+    "status": "Under construction",
+    "floor_plans": [
+      "Studio",
+      "1BR"
+    ],
+    "rent_min": 950,
+    "rent_max": 1250,
+    "rent_is_estimate": false,
+    "amenities": [
+      "Private balconies",
+      "Below-grade parking (24 stalls)",
+      "Bike parking",
+      "Ground-floor patios",
+      "Walk to James Madison Park and Lake Mendota"
+    ],
+    "description": "A five-story, 73-unit building replacing a row of older houses on North Butler Street, a block from James Madison Park. Fisher is pitching it as a lower-cost downtown option, with a simple, efficient design aimed at keeping rents well below those of new high-rises.",
+    "website": null,
+    "sources": [
+      "https://downtownmadison.org/map-marker/117-125-north-butler-street/",
+      "https://madison.com/news/local/business/development/article_be420ef2-692f-4224-9758-b153c061c279.html",
+      "https://madison.com/news/local/business/development/article_d308fc02-5872-4f1d-a991-dee9a1eba031.html"
+    ],
+    "notes": "Rents come from the developer as quoted by the Wisconsin State Journal in Feb 2026: studios under $1,000 and 1BRs at about $1,200. They are approximate and may change. The unit mix beyond studios and 1BRs is unconfirmed. In Feb 2026 construction was expected to start 'in the next few months'; I could not confirm that it has actually started, so status 'Under construction' and opening '2027' are assumptions. There is no property website yet. Some sources give the address as 121 N Butler St. Amenities are inferred from the rendering (balconies, patios, bike racks) and the approval (24 underground stalls). The coordinates are the OSM building at 123 N Butler, the center of the site. Only one rendering was found.",
+    "photos": [
+      {
+        "file": "img/buildings/the-bella/1.jpg",
+        "credit": "Rendering: Fisher Apartments, via Wisconsin State Journal",
+        "source_url": "https://bloximages.chicago2.vip.townnews.com/madison.com/content/tncms/assets/v3/editorial/b/e4/be420ef2-692f-4224-9758-b153c061c279/68ed6f8a3a489.preview.png"
+      }
+    ]
+  },
+  {
+    "slug": "atmosphere-on-mifflin",
+    "name": "Atmosphere on Mifflin",
+    "address": "619-699 W Mifflin St, Madison, WI",
+    "zip": "53703",
+    "neighborhood": "Bassett",
+    "lat": 43.0696124,
+    "lng": -89.3938665,
+    "kind": "student",
+    "leasing": "per_bed",
+    "stories": 10,
+    "units": 264,
+    "beds": 697,
+    "developer": "Trinitas Ventures (joint venture with Starwood Capital Group)",
+    "opening": "Summer 2028",
+    "status": "Under construction",
+    "floor_plans": [
+      "Studio",
+      "1BR",
+      "2BR",
+      "3BR",
+      "4BR",
+      "5BR"
+    ],
+    "rent_min": 1050,
+    "rent_max": 1700,
+    "rent_is_estimate": true,
+    "amenities": [
+      "Rooftop pool and sauna",
+      "Fitness center",
+      "15,000+ sq ft clubhouse and amenity space",
+      "Interior and exterior courtyards",
+      "Terrace with Capitol and Kohl Center views",
+      "Historic Wiedenbeck-Dobelin Warehouse kept as part of the community"
+    ],
+    "description": "A 10-story student community on West Mifflin Street, built around the historic Wiedenbeck-Dobelin Warehouse and next to the old Milwaukee Road depot. It offers everything from studios to five-bedroom units a short walk from the UW campus and the Kohl Center, with a rooftop pool among its shared spaces.",
+    "website": null,
+    "sources": [
+      "https://www.channel3000.com/news/10-story-student-housing-development-coming-to-west-mifflin-street/article_776ee9f7-becc-4338-aa15-74e0d33f40f6.html",
+      "https://rebusinessonline.com/starwood-capital-trinitas-to-develop-three-student-housing-communities-totaling-2046-beds/",
+      "https://ibmadison.com/city-council-oks-10-story-mifflin-street-redevelopment-project/",
+      "https://downtownmadison.org/map-marker/619-and-699-w-mifflin-street/",
+      "https://www.universityliving.com/united-states/madison-heights/property/atmosphere-madison"
+    ],
+    "notes": "Unit and bed counts conflict across sources. The downtown tracker says ~239 units; the Dec 2024 council approval (ibmadison) says 665 beds; the Sep 11, 2026 announcements (Channel3000, REBusiness) say 264 units / 697 beds. I used the most recent figures. Construction reportedly began in August 2026, with completion in summer 2028. The unit mix (studios through 5-bed, plus some double-occupancy rooms) comes from the 2024 approval; the floor plan list is a summary of it. No rents are published. The estimate is per bed, based on Trinitas's nearby Atmosphere Madison (listed from about $1,039/bed) and other new downtown student high-rises, which run roughly $1,000-$1,700/bed. There is no dedicated property website yet. The only rendering found is low resolution (616px), from Trinitas via Channel3000; REBusiness ran the same rendering, so only one photo is kept.",
+    "photos": [
+      {
+        "file": "img/buildings/atmosphere-on-mifflin/1.jpg",
+        "credit": "Rendering: Trinitas Ventures",
+        "source_url": "https://bloximages.newyork1.vip.townnews.com/channel3000.com/content/tncms/assets/v3/editorial/e/13/e1350762-502c-42a1-a601-c7670a885808/6aa4005c2a0aa.image.png"
+      }
+    ]
+  },
+  {
+    "slug": "oliv-madison-broom",
+    "name": "\u014dLiv Madison Broom",
+    "address": "W Johnson St & N Broom St, Madison, WI",
+    "zip": "53703",
+    "neighborhood": "Campus/State St",
+    "lat": 43.073767,
+    "lng": -89.3911966,
+    "kind": "student",
+    "leasing": "per_bed",
+    "stories": 15,
+    "units": 474,
+    "beds": 1723,
+    "developer": "Core Spaces",
+    "opening": "2027",
+    "status": "Under construction",
+    "floor_plans": [
+      "Studio",
+      "1BR",
+      "2BR",
+      "4BR",
+      "5BR",
+      "Townhome"
+    ],
+    "rent_min": 1100,
+    "rent_max": 2000,
+    "rent_is_estimate": true,
+    "amenities": [
+      "Rooftop pool and hot tub",
+      "Rooftop lounges",
+      "Fitness center with steam room and sauna",
+      "Gaming and social lounge",
+      "Study and meeting space",
+      "Ground-floor retail",
+      "721 bike parking spaces"
+    ],
+    "description": "A large Core Spaces student complex filling most of the block bounded by West Johnson, North Broom and West Gorham streets, spread across several connected buildings that rise to about 15 stories. Layouts range from studios to five-bedroom units plus a few townhomes, and 10% of the beds are set aside at a 40% discount under a deal with the city and UW-Madison.",
+    "website": null,
+    "sources": [
+      "https://www.multifamilydive.com/news/core-spaces-new-student-housing-developments/828870/",
+      "https://studenthousingbusiness.com/core-spaces-to-develop-three-student-housing-communities-near-university-of-wisconsin-madison/",
+      "https://www.antunovich.com/madison-johnson-broom",
+      "https://www.jacobsoncre.com/property-listings/oliv-madison-broom",
+      "https://captimes.com/news/development/student-apartment-tower-with-1-600-beds-gets-first-ok-from-madison/article_56d71efe-833c-11ee-a89c-d71a584b9fa8.html",
+      "https://www.dailycardinal.com/article/2023/09/new-student-high-rise-johnson-broom-to-include-10-affordable-units"
+    ],
+    "notes": "The brand is \u014dLiv (Core Spaces' premium label), not Hub or Rise. Hub Madison Bassett is a different Core Spaces building at Johnson & Bassett that opened in fall 2026. Counts vary by source: the downtown tracker says ~437 units; the 2023 approval said 465 units / 1,600+ beds; the architect (Antunovich) says 472 units / 1,646 beds / 14 stories; Student Housing Business says 15 stories, 474 units, 1,723 beds. I used the most recent developer-reported figures (474 / 1,723 / 15). Multifamily Dive (Aug 2026) and JCRE list delivery in 2027 (Q1 2027 for retail), so 'Under construction' is inferred. No official leasing site for Broom was found (olivmadison.com is the separate 339 W Gorham building). There is no single street address, so the coordinates are from Nominatim for 357 W Johnson St, on the project block. Rents are not published. The per-bed estimate is based on the existing \u014dLiv Madison and Hub Madison (roughly $1,100-$2,000/bed depending on unit size); the 10% affordable beds are 40% below market. The floor plan list is from JCRE (studio, 1, 2, 4, 5-bed) plus townhomes from Student Housing Business. Only one rendering was found.",
+    "photos": [
+      {
+        "file": "img/buildings/oliv-madison-broom/1.jpg",
+        "credit": "Rendering: Antunovich Associates / Core Spaces",
+        "source_url": "https://irp.cdn-website.com/6fc69dac/dms3rep/multi/opt/Hub+-+John+Broom006-1920w.jpg"
+      }
+    ]
+  },
+  {
+    "slug": "theory-madison",
+    "name": "Theory Madison",
+    "address": "427 N Lake St, Madison, WI",
+    "zip": "53715",
+    "neighborhood": "Campus/State St",
+    "lat": 43.0737254,
+    "lng": -89.3973023,
+    "kind": "student",
+    "leasing": "per_bed",
+    "stories": 12,
+    "units": null,
+    "beds": 700,
+    "developer": "Mortenson (with Northwestern Mutual; managed by PeakMade)",
+    "opening": "Summer 2026",
+    "status": "Now leasing",
+    "floor_plans": [
+      "Studio",
+      "1BR",
+      "2BR",
+      "4BR",
+      "5BR",
+      "Townhome"
+    ],
+    "rent_min": 865,
+    "rent_max": 2299,
+    "rent_is_estimate": true,
+    "amenities": [
+      "Rooftop pool and spa deck",
+      "Fitness center and sauna",
+      "Caf\u00e9",
+      "Private and group study rooms",
+      "Game room",
+      "Dog wash / pet spa",
+      "Fully furnished with in-unit washer/dryer",
+      "Wi-Fi included"
+    ],
+    "description": "A 12-story student tower on North Lake Street that replaced the old State Street Campus Garage. It also contains an intercity bus terminal and public parking. Units run from studios to five-bedroom townhome-style layouts, all furnished, and a rooftop pool deck looks out toward Lake Mendota and the Capitol.",
+    "website": "https://theorymadison.com/",
+    "sources": [
+      "https://www.mortenson.com/projects/theory-madison",
+      "https://theorymadison.com/",
+      "https://theorymadison.com/floor-plans/",
+      "https://theorymadison.com/faq/",
+      "https://theorymadison.com/gallery/",
+      "https://www.rentcollegepads.com/city/madison-wi/listings/theory-madison-232578"
+    ],
+    "notes": "The address is 427 N Lake St (from the property site), not W Johnson & N Bassett as the brief suggested. Mortenson reports 700+ beds (100 of them affordable for UW students), 12 stories, and a June/summer 2026 completion. beds=700 is a floor; some listing sites say 536 beds, which looks outdated. No unit count is published. The property site says 'Now leasing for Fall 2027' and shows 'Call for pricing' on every floor plan. The $865-$2,299/bed range comes from third-party listing sites (RentCollegePads/uhomes), so rent_is_estimate is true. Photos are professional photos of the finished building from the official site gallery (Sept 2026 uploads).",
+    "photos": [
+      {
+        "file": "img/buildings/theory-madison/1.jpg",
+        "credit": "Photo: Theory Madison / PeakMade",
+        "source_url": "https://theorymadison.com/wp-content/uploads/2026/09/TM_Exteriors-21-scaled.jpg"
+      },
+      {
+        "file": "img/buildings/theory-madison/2.jpg",
+        "credit": "Photo: Theory Madison / PeakMade",
+        "source_url": "https://theorymadison.com/wp-content/uploads/2026/09/TM_Exteriors-31-scaled.jpg"
+      },
+      {
+        "file": "img/buildings/theory-madison/3.jpg",
+        "credit": "Photo: Theory Madison / PeakMade",
+        "source_url": "https://theorymadison.com/wp-content/uploads/2026/09/TM_Exteriors-5-scaled.jpg"
+      }
+    ]
+  }
+]

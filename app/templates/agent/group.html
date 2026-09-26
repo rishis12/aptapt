@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ group.name }}, leasing view{% endblock %}
+{% block content %}
+<nav class="crumbs"><a href="{{ url_for('agent.dashboard') }}">Leasing dashboard</a></nav>
+<header class="group-header">
+  {{ ui.photo(apt, photos, 'group-photo') }}
+  <div>
+    <h1>{{ group.name }}</h1>
+    <p class="muted">{{ apt.name }}. {{ count }} committed renters.</p>
+  </div>
+</header>
+
+<div class="group-layout">
+  <div class="group-main">
+    {% if deal %}
+      <section class="panel">
+        <div class="panel-head"><h2>Reservations</h2>{{ ui.status(group, deal) }}</div>
+        {% if deal.status == 'reserving' %}
+          <p>The window closes {{ deal.window_ends_at|date('%a %b %-d at %-I:%M %p') }} ({{ deal.window_ends_at|until }}). Renters who haven't reserved by then are dropped.</p>
+        {% endif %}
+        {% if deal.status == 'short' %}
+          <div class="callout callout-red">
+            <p><strong>{{ deal_counts.active }} of {{ offer.required_size }}</strong> renters are still in. Decide what happens next:</p>
+          </div>
+          <form method="post" action="{{ url_for('agent.decide', group_id=group.id) }}" class="decide">
+            {{ csrf_field() }}
+            <button class="btn" name="action" value="honor">Honor the deal for {{ deal_counts.active }}</button>
+            <button class="btn btn-quiet" name="action" value="extend">Extend 48 hours to fill spots</button>
+            <button class="btn btn-quiet danger" name="action" value="cancel" data-confirm-click="Cancel the deal and refund everyone?">Cancel and refund everyone</button>
+          </form>
+        {% endif %}
+        <table class="table">
+          <thead><tr><th>Renter</th><th>Status</th><th>Unit</th><th>Move-in</th><th></th></tr></thead>
+          <tbody>
+            {% for m in roster %}
+              <tr>
+                <td>{{ m.name }}</td>
+                <td><span class="people-step step-{{ m.status }}">{{ {'pending': 'Not reserved', 'reserved': 'Reserved', 'signed': 'Signed', 'dropped': 'Dropped'}[m.status] }}</span></td>
+                <td>{{ m.floor_plan or '' }}</td>
+                <td>{{ m.move_in|date if m.move_in else '' }}</td>
+                <td class="num">
+                  {% if m.status in ('pending', 'reserved') and deal.status == 'reserving' %}
+                    <form method="post" action="{{ url_for('agent.nudge', group_id=group.id, user_id=m.user_id) }}">{{ csrf_field() }}<button class="linklike">Send reminder</button></form>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    {% elif group.kind == 'committed' and group.status in ('forming', 'agent_invited', 'offer_active') %}
+      <section class="panel">
+        <h2>{{ 'Update your offer' if offer and offer.source == 'agent' else 'Make this group an offer' }}</h2>
+        <p class="muted">These renters paid a deposit to show they'll sign if the offer unlocks. Pick the group size that makes the incentive worth it to you.</p>
+        <form method="post" action="{{ url_for('agent.post_offer', group_id=group.id) }}" class="stack">
+          {{ csrf_field() }}
+          <label>Incentive
+            <select name="incentive_type">{% for k, v in incentive_types.items() %}<option value="{{ k }}" {% if offer and offer.incentive_type == k %}selected{% endif %}>{{ v }}</option>{% endfor %}</select>
+          </label>
+          <label>Headline <input name="title" maxlength="80" required value="{{ offer.title if offer else '' }}" placeholder="$150 off monthly rent for 12 months"></label>
+          <label>Details (optional) <textarea name="details" rows="2" placeholder="Eligible units, lease length, move-in window">{{ offer.details if offer else '' }}</textarea></label>
+          <label>Unlocks at this many committed renters <input name="required_size" type="number" min="2" max="200" required value="{{ offer.required_size if offer else [count + 4, 6]|max }}"></label>
+          <button class="btn">{{ 'Update offer' if offer else 'Post offer' }}</button>
+        </form>
+        {% if offer and group.status == 'offer_active' %}
+          <form method="post" action="{{ url_for('agent.withdraw_offer', group_id=group.id) }}" data-confirm="Withdraw this offer?">
+            {{ csrf_field() }}<button class="linklike danger">Withdraw offer</button>
+          </form>
+        {% endif %}
+      </section>
+    {% endif %}
+    {% include "partials/group_status.html" %}
+  </div>
+  <aside class="group-side">
+    {% include "partials/chat.html" %}
+  </aside>
+</div>
+{% endblock %}

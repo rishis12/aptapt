@@ -1,0 +1,14 @@
+<div id="feed" class="feed" hx-get="{{ url_for('groups.feed', group_id=group_id or group.id) }}" hx-trigger="every 3s" hx-swap="outerHTML">
+  {% for msg in feed %}
+    {% if msg.kind == 'system' %}
+      <p class="feed-event">{{ msg.body }}<time>{{ msg.created_at[11:16] }}</time></p>
+    {% else %}
+      <div class="feed-msg{% if current_user and msg.user_id == current_user.id %} is-mine{% endif %}{% if msg.user_role == 'agent' %} is-agent{% endif %}">
+        <p class="feed-who">{{ msg.user_name }}{% if msg.user_role == 'agent' %}<span>Leasing office</span>{% endif %}<time>{{ msg.created_at[11:16] }}</time></p>
+        <p class="feed-body">{{ msg.body }}</p>
+      </div>
+    {% endif %}
+  {% else %}
+    <p class="muted">No messages yet.</p>
+  {% endfor %}
+</div>

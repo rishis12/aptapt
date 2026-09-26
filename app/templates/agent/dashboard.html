@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Leasing dashboard{% endblock %}
+{% block content %}
+<h1>{{ current_user.company or current_user.name }}</h1>
+<p class="muted">Renter groups at your buildings, and what they're waiting on.</p>
+
+{% if pitches %}
+  <section class="section-gap">
+    <h2>Groups pitching you</h2>
+    <ul class="rows rows-lg">
+      {% for p in pitches %}
+        <li>
+          <strong>{{ p.apartment_name }}</strong>
+          <span>{{ p.size }} committed renters</span>
+          <span class="muted">Respond {{ p.respond_by|until }}</span>
+          <a class="btn btn-small" href="{{ url_for('pitch.show', token=p.token) }}">Review pitch</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+{% if todo %}
+  <section class="section-gap">
+    <h2>Needs your attention</h2>
+    <ul class="rows rows-lg">
+      {% for apt, c, label in todo %}
+        <li>
+          <strong>{{ apt.name }}</strong>
+          <span>{{ c.group.name }}, {{ c.count }} renters</span>
+          <span>{{ ui.status(c.group, c.deal) }}</span>
+          <a class="btn btn-small" href="{{ url_for('agent.group', group_id=c.group.id) }}">{{ label }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+{% for b in buildings %}
+  <section class="agent-building section-gap">
+    <header>
+      {{ ui.photo(b.apt, b.apt.photos|fromjson, 'agent-photo') }}
+      <div>
+        <h2><a href="{{ url_for('apartments.detail', slug=b.apt.slug) }}">{{ b.apt.name }}</a></h2>
+        <p class="muted">{{ b.apt.address }}</p>
+      </div>
+      <dl class="agent-stats">
+        <div><dt>Exploring</dt><dd>{{ b.stats.interested }}</dd></div>
+        <div><dt>Committed now</dt><dd>{{ b.stats.committed_count }}</dd></div>
+        <div><dt>Deals unlocked</dt><dd>{{ b.stats.unlocked_groups }}</dd></div>
+      </dl>
+    </header>
+    {% if b.committed %}
+      <table class="table">
+        <thead><tr><th>Group</th><th class="num">Renters</th><th>Status</th><th>Terms</th><th></th></tr></thead>
+        <tbody>
+          {% for c in b.committed %}
+            <tr>
+              <td>{{ c.group.name }}</td>
+              <td class="num">{{ c.count }}{% if c.offer %} of {{ c.offer.required_size }}{% endif %}</td>
+              <td>{{ ui.status(c.group, c.deal) }}</td>
+              <td>{{ c.offer.title if c.offer else 'No offer yet' }}</td>
+              <td class="num"><a href="{{ url_for('agent.group', group_id=c.group.id) }}">Open</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty">No committed groups yet.</p>
+    {% endif %}
+  </section>
+{% else %}
+  <p class="empty section-gap">You don't manage any buildings on aptapt yet. When a group invites you or pitches you, their link connects you to the building.</p>
+{% endfor %}
+{% endblock %}

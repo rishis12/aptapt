@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Lease together{% endblock %}
+{% block main_class %}home{% endblock %}
+{% block content %}
+{% set lead = buildings[0] if buildings else None %}
+<section class="hero">
+  <div class="hero-copy">
+    <h1>Sign together.<br>Pay less.</h1>
+    <p class="hero-lede">Buildings give their best deals to whoever fills a floor. aptapt lets renters commit as a group, so the leasing office sees ten signatures instead of one, and the discount goes to all of you.</p>
+    <form class="hero-search" method="get" action="{{ url_for('apartments.search') }}">
+      <label for="zip">Madison ZIP code</label>
+      <div class="hero-search-row">
+        <input id="zip" name="zip" value="{{ zip }}" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" list="madison-zips" required>
+        <input type="hidden" name="radius" value="2">
+        <button class="btn">Show buildings</button>
+      </div>
+      <datalist id="madison-zips">{% for z in zips %}<option value="{{ z.zip }}">{{ z.label }}</option>{% endfor %}</datalist>
+    </form>
+  </div>
+  {% if lead %}
+  <a class="hero-feature" href="{{ url_for('apartments.detail', slug=lead.apt.slug) }}">
+    {{ ui.photo(lead.apt, lead.apt.photos|fromjson, 'hero-photo', eager=True) }}
+    <div class="hero-feature-card">
+      {% set s = lead.stats %}
+      {{ ui.meter(s.committed_count, s.offer.required_size if s.offer else invite_threshold, 'md', animate=True) }}
+      <div>
+        <p class="hero-feature-name">{{ lead.apt.name }}</p>
+        <p>{{ s.committed_count }} of {{ s.offer.required_size if s.offer else invite_threshold }} committed{% if s.offer %} for {{ s.offer.title|lower }}{% endif %}</p>
+      </div>
+    </div>
+  </a>
+  {% endif %}
+</section>
+
+<section class="lineup">
+  <h2>New in downtown Madison</h2>
+  <p class="section-lede">Five buildings opening or leasing now. Each has groups forming.</p>
+  <ol class="lineup-list">
+    {% for b in buildings %}
+      {% set s = b.stats %}
+      <li>
+        <a class="lineup-row" href="{{ url_for('apartments.detail', slug=b.apt.slug) }}">
+          {{ ui.photo(b.apt, b.apt.photos|fromjson, 'lineup-photo') }}
+          <div class="lineup-main">
+            <h3>{{ b.apt.name }}</h3>
+            <p class="muted">{{ b.apt.address }}, {{ b.apt.neighborhood }}</p>
+            <dl class="facts-inline">
+              <div><dt>Opens</dt><dd>{{ b.apt.opening or 'Now' }}</dd></div>
+              <div><dt>Rent</dt><dd>{{ ui.rent(b.apt) }}</dd></div>
+              <div><dt>Leasing</dt><dd>{{ 'By the bed' if b.apt.leasing == 'per_bed' else 'By the unit' }}</dd></div>
+            </dl>
+          </div>
+          <div class="lineup-group">
+            {% if s.committed_group %}
+              {{ ui.meter(s.committed_count, s.offer.required_size if s.offer else invite_threshold, 'sm', animate=False) }}
+              <p><strong>{{ s.committed_count }}</strong> committed{% if s.offer %}, {{ s.needed }} to go{% endif %}</p>
+              {% if s.offer %}<p class="muted">{{ s.offer.title }}</p>{% endif %}
+            {% elif s.interested %}
+              <p><strong>{{ s.interested }}</strong> exploring</p><p class="muted">No committed group yet</p>
+            {% else %}
+              <p class="muted">Be the first to start a group</p>
+            {% endif %}
+          </div>
+        </a>
+      </li>
+    {% endfor %}
+  </ol>
+</section>
+
+<section class="how">
+  <h2>How a group deal works</h2>
+  <ol class="how-steps">
+    <li><h3>Commit with $15</h3><p>Join a building's committed group with a refundable $15 deposit. It shows the leasing office you're serious. Leave the group and you forfeit it.</p></li>
+    <li><h3>Fill the windows</h3><p>Every renter who commits lights a window. Invite friends to hit the target before the group's due date. Miss it and everyone gets their $15 back.</p></li>
+    <li><h3>Get the offer</h3><p>If the manager is on aptapt, they make the group an offer. If not, your group sets its own ask and we pitch it to them.</p></li>
+    <li><h3>Reserve and sign</h3><p>When the deal unlocks, you have 72 hours to reserve a unit. Sign your lease and your $15 comes back.</p></li>
+  </ol>
+</section>
+{% endblock %}

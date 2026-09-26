@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Buildings near {{ zip }}{% endblock %}
+{% block body_class %}is-browse{% endblock %}
+{% block main_class %}browse{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" defer></script>
+{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<section class="browse-list">
+  <form class="browse-filter" method="get" action="{{ url_for('apartments.search') }}">
+    <label>Near
+      <input name="zip" value="{{ zip }}" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" list="madison-zips" required>
+    </label>
+    <datalist id="madison-zips">{% for z in zips %}<option value="{{ z.zip }}">{{ z.label }}</option>{% endfor %}</datalist>
+    <label>Within
+      <select name="radius">
+        {% for r in radius_choices %}<option value="{{ r }}" {% if r == radius %}selected{% endif %}>{{ r|string|replace('.0', '') }} miles</option>{% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-quiet">Update</button>
+  </form>
+  <h1 class="browse-count">{{ results|length }} building{{ '' if results|length == 1 else 's' }} within {{ radius|string|replace('.0', '') }} miles of {{ center.label }}</h1>
+
+  <ol class="listing">
+    {% for r in results %}
+      {% set apt, s = r.apt, r.stats %}
+      <li>
+        <a class="listing-item" href="{{ url_for('apartments.detail', slug=apt.slug) }}" data-marker="{{ apt.slug }}">
+          {{ ui.photo(apt, apt.photos|fromjson, 'listing-photo') }}
+          <div class="listing-body">
+            <div class="listing-head">
+              <h2>{{ apt.name }}</h2>
+              <span class="muted">{{ '%.1f'|format(r.distance) }} mi</span>
+            </div>
+            <p class="muted">{{ apt.address }}</p>
+            <p class="listing-rent">{{ ui.rent(apt) }}<span class="muted">{% if apt.rent_is_estimate and apt.rent_min %}, estimated{% endif %}</span></p>
+            <div class="listing-group">
+              {% if s.committed_group %}
+                {{ ui.meter(s.committed_count, s.offer.required_size if s.offer else invite_threshold, 'xs', animate=False) }}
+                <p>{{ s.committed_count }} committed{% if s.offer %}. {{ s.needed }} more unlocks {{ s.offer.title|lower }}{% endif %}</p>
+              {% else %}
+                <p class="muted">No committed group yet</p>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+      </li>
+    {% else %}
+      <li class="empty">No buildings within {{ radius|string|replace('.0', '') }} miles. Try a wider radius.</li>
+    {% endfor %}
+  </ol>
+</section>
+<section class="browse-map" aria-label="Map">
+  <div id="map" data-center='{{ center|tojson }}' data-radius="{{ radius }}" data-markers='{{ markers|tojson }}'></div>
+</section>
+{% endblock %}

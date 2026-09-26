@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Email sent to {{ pitch.to_name }}{% endblock %}
+{% block content %}
+<nav class="crumbs"><a href="{{ url_for('groups.show', group_id=group.id) }}">{{ group.name }}</a></nav>
+<p class="muted">This is the email aptapt would send. In this demo it isn't actually delivered.</p>
+<article class="email">
+  <dl class="email-head">
+    <div><dt>From</dt><dd>aptapt &lt;groups@aptapt.test&gt;</dd></div>
+    <div><dt>To</dt><dd>{{ pitch.to_name }} &lt;{{ pitch.to_email }}&gt;</dd></div>
+    <div><dt>Subject</dt><dd>{{ count }} committed renters want to lease at {{ apt.name }}</dd></div>
+    <div><dt>Sent</dt><dd>{{ pitch.sent_at|date('%b %-d, %Y at %-I:%M %p') }}</dd></div>
+  </dl>
+  <div class="email-body">
+    <p>Hi {{ pitch.to_name.split()[0] }},</p>
+    <p>A group of {{ count }} renters on aptapt has committed to leasing at {{ apt.name }} ({{ apt.address }}). Each of them has paid a deposit to show they'll sign.</p>
+    <p>Here's what they're asking for:</p>
+    <blockquote>{{ ask.title }}{% if ask.details %}<br>{{ ask.details }}{% endif %}</blockquote>
+    <p>You can accept, send a counter-offer, or decline by {{ pitch.respond_by|date('%B %-d') }}. It takes about a minute.</p>
+    <p><a class="btn" href="{{ url_for('pitch.show', token=pitch.token) }}">Review the group's pitch</a></p>
+    <p>aptapt</p>
+  </div>
+</article>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Receipt{% endblock %}
+{% block content %}
+<article class="receipt">
+  <p class="receipt-check" aria-hidden="true"></p>
+  {% if co.purpose == 'commitment' %}
+    <h1>You're committed to {{ apt.name }}</h1>
+    {% if group.status == 'unlocked' and deal %}
+      <p class="receipt-lede">You were the renter who unlocked the deal. Reserve your unit within 72 hours.</p>
+    {% elif group.status == 'pitch_sent' %}
+      <p class="receipt-lede">You filled the group. We've pitched its ask to the building's manager.</p>
+    {% else %}
+      <p class="receipt-lede">{{ group.name }} now has {{ count }} committed renters. Invite friends to fill it faster.</p>
+    {% endif %}
+  {% else %}
+    <h1>Your unit is reserved</h1>
+    <p class="receipt-lede">{{ co.floor_plan }} at {{ apt.name }}{% if co.move_in %}, moving in {{ co.move_in|date }}{% endif %}. The last step is signing your lease.</p>
+  {% endif %}
+
+  <dl class="receipt-lines">
+    <div><dt>Amount</dt><dd>{{ co.amount_cents|cents }}</dd></div>
+    <div><dt>Paid with</dt><dd>{{ co.card_brand }} ending {{ co.card_last4 }}</dd></div>
+    <div><dt>Date</dt><dd>{{ deposit.created_at|date('%b %-d, %Y at %-I:%M %p') if deposit else '' }}</dd></div>
+    <div><dt>Reference</dt><dd>APT-{{ '%06d'|format(deposit.id if deposit else 0) }}</dd></div>
+    <div><dt>Status</dt><dd>Held (test mode, nothing charged)</dd></div>
+  </dl>
+
+  {% if co.purpose == 'commitment' %}
+    <p class="fine">We refund this $15 when you sign your lease, or if {{ group.name }} misses its due date on {{ group.due_at|date }}. If you leave the group, you forfeit it.</p>
+  {% else %}
+    <p class="fine">Your $250 is applied to your first month's rent when you sign. If the leasing office cancels the deal, it's refunded.</p>
+  {% endif %}
+
+  <div class="actions">
+    <a class="btn" href="{{ url_for('groups.show', group_id=group.id) }}">{{ 'Sign your lease' if co.purpose == 'holding' else 'Go to your group' }}</a>
+    <a class="btn btn-quiet" href="{{ url_for('groups.my_groups') }}">See all deposits</a>
+  </div>
+</article>
+{% endblock %}

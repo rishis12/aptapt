@@ -1,0 +1,38 @@
+<section class="demo-controls" aria-label="Demo controls">
+  <h2>Demo controls</h2>
+  <p>Simulate what would happen over days, in seconds.</p>
+  <div class="demo-actions">
+    {% if group.kind == 'exploratory' or group.status in ('forming', 'agent_invited', 'offer_active') or (deal and deal.extended and deal.status == 'reserving') %}
+      <form method="post" action="{{ url_for('demo.add_members', group_id=group.id) }}">
+        {{ csrf_field() }}<input type="hidden" name="back" value="{{ request.path }}">
+        <select name="n" aria-label="How many">{% for n in (1, 3, 5, 10) %}<option value="{{ n }}" {% if n == 3 %}selected{% endif %}>{{ n }}</option>{% endfor %}</select>
+        <button class="btn btn-quiet btn-small">{{ 'renters join' if group.kind == 'exploratory' else 'renters commit' }}</button>
+      </form>
+    {% endif %}
+    {% if group.kind == 'committed' and group.status in ('forming', 'agent_invited', 'offer_active') %}
+      <form method="post" action="{{ url_for('demo.due_now', group_id=group.id) }}">
+        {{ csrf_field() }}<input type="hidden" name="back" value="{{ request.path }}">
+        <button class="btn btn-quiet btn-small">Skip to due date</button>
+      </form>
+    {% endif %}
+    {% if pitch and pitch.status == 'sent' %}
+      {% for action, label in (('accept', 'Manager accepts'), ('counter', 'Manager counters'), ('decline', 'Manager declines')) %}
+        <form method="post" action="{{ url_for('demo.manager_responds', group_id=group.id) }}">
+          {{ csrf_field() }}<input type="hidden" name="back" value="{{ request.path }}">
+          <button class="btn btn-quiet btn-small" name="action" value="{{ action }}">{{ label }}</button>
+        </form>
+      {% endfor %}
+      <a class="btn btn-quiet btn-small" href="{{ url_for('pitch.show', token=pitch.token) }}">Open the manager's view</a>
+    {% endif %}
+    {% if deal and deal.status == 'reserving' %}
+      <form method="post" action="{{ url_for('demo.demo_renters_sign', group_id=group.id) }}">
+        {{ csrf_field() }}<input type="hidden" name="back" value="{{ request.path }}">
+        <button class="btn btn-quiet btn-small">Simulated renters reserve and sign</button>
+      </form>
+      <form method="post" action="{{ url_for('demo.end_window', group_id=group.id) }}">
+        {{ csrf_field() }}<input type="hidden" name="back" value="{{ request.path }}">
+        <button class="btn btn-quiet btn-small">Skip to end of window</button>
+      </form>
+    {% endif %}
+  </div>
+</section>
