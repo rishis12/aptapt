@@ -11,7 +11,7 @@ from . import clock, deals
 from . import db as dbmod
 from . import groups as svc
 from . import payments
-from .seed import seed
+from .seed import seed, sync_building_links
 
 
 def create_app(test_config=None):
@@ -32,6 +32,13 @@ def create_app(test_config=None):
         conn = dbmod.connect(app.config["DATABASE"])
         seed(conn)
         conn.close()
+
+    if not app.config.get("TESTING"):
+        conn = dbmod.connect(app.config["DATABASE"])
+        try:
+            sync_building_links(conn)
+        finally:
+            conn.close()
 
     app.teardown_appcontext(dbmod.close_db)
 

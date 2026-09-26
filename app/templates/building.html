@@ -26,12 +26,12 @@
 
 <div class="building-layout">
   <article class="building-info">
-    <h1>{{ apt.name }}</h1>
+    <h1>{% if apt.website or apt.info_url %}<a href="{{ apt.website or apt.info_url }}" target="_blank" rel="noopener noreferrer" title="{{ 'Official website' if apt.website else 'Project details' }} (opens in a new tab)">{{ apt.name }}</a>{% else %}{{ apt.name }}{% endif %}</h1>
     <p class="building-address">{{ apt.address }}, Madison, WI {{ apt.zip }}</p>
     {% if apt.info_url %}
       <p class="building-links">
         <a href="{{ apt.info_url }}" target="_blank" rel="noopener">{{ 'Official website' if apt.website else 'Project details' }}</a>
-        <span class="muted">{{ apt.info_url|domain }}{% if not apt.website %}. {{ apt.name }} doesn't have a leasing site yet.{% endif %}</span>
+        <span class="muted">{{ apt.info_url|domain }}{% if not apt.website %}. {{ apt.name }} doesn't have a verified leasing website listed.{% endif %}</span>
       </p>
     {% endif %}
 

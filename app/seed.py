@@ -68,6 +68,28 @@ def info_url(building):
     return next((u for pref in PREFERRED_INFO_SOURCES for u in sources if pref in u), sources[0] if sources else None)
 
 
+
+def sync_building_links(db):
+    """Refresh public property links without resetting existing renters or groups."""
+    columns = {row[1] for row in db.execute("PRAGMA table_info(apartments)")}
+    if "info_url" not in columns:
+        db.execute("ALTER TABLE apartments ADD COLUMN info_url TEXT")
+    if "sources" not in columns:
+        db.execute("ALTER TABLE apartments ADD COLUMN sources TEXT NOT NULL DEFAULT '[]'")
+    for building in load_buildings():
+        db.execute(
+            "UPDATE apartments SET website = ?, info_url = ?, sources = ? WHERE slug = ?",
+            (building.get("website"), info_url(building), json.dumps(building.get("sources") or []), building["slug"]),
+        )
+    # Older demos include this proposed project instead of Axton. Keep its identity
+    # and groups intact, and link to the City's project submission.
+    db.execute(
+        "UPDATE apartments SET info_url = ? WHERE slug = ? AND website IS NULL AND info_url IS NULL",
+        ("https://madison.legistar.com/View.ashx?G=D66739FE-4C3C-468C-A9F0-0198EFAA8EF8&GUID=52F16A72-B9DE-4437-BBB7-8A4702DC386E&ID=13342289&M=F", "atmosphere-on-mifflin"),
+    )
+    db.commit()
+
+
 def manager_for(building):
     key = f"{building['slug']} {building['name']}".lower()
     return next(m for m in MANAGERS if m["match"] in key)
