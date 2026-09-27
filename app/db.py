@@ -26,4 +26,4 @@ def close_db(_exc=None):
 
 
 def init_schema(conn):
-    conn.executescript(SCHEMA.read_text())
+    conn.executescript(SCHEMA.read_text(encoding="utf-8"))

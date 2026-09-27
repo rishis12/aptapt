@@ -38,6 +38,36 @@ document.addEventListener("click", async (e) => {
   }
 });
 
+// ---- page-transition skeleton: every page here is local/instant, so fake a beat on real navigations ----
+const pageLoading = document.getElementById("page-loading");
+if (pageLoading) {
+  const MIN_MS = 260;
+  let navigating = false;
+  const goAfterBeat = (fn) => {
+    if (navigating) return;
+    navigating = true;
+    pageLoading.classList.add("is-active");
+    setTimeout(fn, MIN_MS);
+  };
+  document.addEventListener("click", (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const link = e.target.closest("a[href]");
+    if (!link || link.target || link.hasAttribute("download") || link.dataset.noSkeleton) return;
+    let url;
+    try { url = new URL(link.href, location.href); } catch { return; }
+    if (url.origin !== location.origin) return;
+    if (url.pathname === location.pathname && url.search === location.search && url.hash) return; // same-page anchor
+    e.preventDefault();
+    goAfterBeat(() => (location.href = link.href));
+  });
+  document.addEventListener("submit", (e) => {
+    const form = e.target;
+    if (form.method.toLowerCase() !== "get" || form.dataset.noSkeleton) return;
+    e.preventDefault();
+    goAfterBeat(() => form.submit());
+  });
+}
+
 // Don't swap a live-updating panel out from under someone who is typing or has opened a form in it.
 document.addEventListener("toggle", (e) => { if (e.target.matches("details[data-keep]")) e.target.dataset.touched = "1"; }, true);
 document.body.addEventListener("htmx:beforeRequest", (e) => {

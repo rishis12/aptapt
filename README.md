@@ -27,6 +27,8 @@ Configuration (environment variables):
 - `SECRET_KEY`
 - `AGENT_INVITE_THRESHOLD` (default 3)
 - `DEMO_MODE` (default 1; set it to 0 to hide the user switcher and demo controls)
+- `GEMINI_API_KEY` (unset by default; AI features are disabled until this is set)
+- `GEMINI_MODEL` (default `gemini-2.5-flash-lite`)
 
 ## How it works
 

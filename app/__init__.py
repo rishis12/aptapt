@@ -21,6 +21,8 @@ def create_app(test_config=None):
         DATABASE=os.path.join(app.instance_path, "aptapt.sqlite3"),
         AGENT_INVITE_THRESHOLD=int(os.environ.get("AGENT_INVITE_THRESHOLD", "3")),
         DEMO_MODE=os.environ.get("DEMO_MODE", "1") == "1",
+        GEMINI_API_KEY=os.environ.get("GEMINI_API_KEY"),
+        GEMINI_MODEL=os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite"),
         CSRF_ENABLED=True,
         DEFAULT_ZIP="53703",
     )
@@ -147,8 +149,8 @@ def create_app(test_config=None):
         if not value:
             return ""
         if len(value) == 10:
-            return datetime.strptime(value, "%Y-%m-%d").strftime(fmt)
-        return clock.parse(value).strftime(fmt)
+            return clock.strftime(datetime.strptime(value, "%Y-%m-%d"), fmt)
+        return clock.strftime(clock.parse(value), fmt)
 
     @app.cli.command("init-db")
     def init_db_command():

@@ -54,7 +54,7 @@ RENTERS = [
 def load_buildings():
     if not BUILDINGS_JSON.exists():
         raise RuntimeError(f"Missing {BUILDINGS_JSON}. It holds the real building data.")
-    return json.loads(BUILDINGS_JSON.read_text())
+    return json.loads(BUILDINGS_JSON.read_text(encoding="utf-8"))
 
 
 PREFERRED_INFO_SOURCES = ("downtownmadison.org", "antunovich.com")

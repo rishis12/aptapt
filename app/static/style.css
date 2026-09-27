@@ -39,6 +39,27 @@ code { font: 600 .9em var(--font); background: var(--lit-soft); padding: 1px 4px
 .section-gap { margin-top: 48px; }
 .empty { color: var(--slate); padding: 24px 0; }
 
+/* ---- page-transition skeleton -------------------------------------------
+   Everything here is local and instant; this fakes a brief loading beat so
+   in-app navigation reads like a real network round trip. */
+.page-loading {
+  position: fixed; inset: 0; z-index: 999; background: var(--paper);
+  display: flex; flex-direction: column; gap: 18px; padding: 96px var(--gutter);
+  opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .15s ease;
+}
+.page-loading.is-active { opacity: 1; visibility: visible; }
+.skeleton-block {
+  border-radius: var(--radius); background: linear-gradient(90deg, var(--line) 25%, #ECEEEA 37%, var(--line) 63%);
+  background-size: 400% 100%; animation: skeleton-shimmer 1.4s ease infinite;
+}
+.page-loading .sk-title { height: 34px; width: min(420px, 70%); }
+.page-loading .sk-line { height: 14px; }
+.page-loading .sk-row { display: flex; gap: 16px; margin-top: 14px; }
+.page-loading .sk-card { height: 140px; border-radius: 10px; flex: 1; }
+@keyframes skeleton-shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton-block { animation: none; } }
+@media (max-width: 560px) { .page-loading .sk-row { flex-direction: column; } .page-loading .sk-card { height: 72px; } }
+
 /* ---- chrome ------------------------------------------------------------ */
 .demo-bar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--ink); color: #C5D3DA; font-size: .8rem; padding: 6px var(--gutter); }
 .demo-bar span { margin-right: auto; }
@@ -146,8 +167,10 @@ label.check input { width: auto; min-height: 0; margin-top: 4px; }
 /* ---- home --------------------------------------------------------------- */
 .home { padding: 0; }
 .hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); min-height: min(76vh, 720px); background: var(--white); border-bottom: 1px solid var(--line); }
-.hero-copy { padding: 64px var(--gutter) 56px max(var(--gutter), calc((100vw - 1200px) / 2 + var(--gutter))); display: flex; flex-direction: column; justify-content: center; }
-.hero h1 { font-size: clamp(2.75rem, 4.6vw, 4.75rem); font-weight: 900; font-stretch: 125%; line-height: .94; letter-spacing: -.035em; margin-bottom: 28px; }
+.hero-copy { container-type: inline-size; min-width: 0; padding: 64px max(var(--gutter), calc((100% - 580px) / 2)) 56px; display: flex; flex-direction: column; justify-content: center; }
+/* Sized to the copy column's own width (cqi), not the viewport, so it can't outgrow the column as the screen widens. */
+.hero h1 { font-size: clamp(2rem, 11.5cqi, 4.75rem); font-weight: 900; font-stretch: 125%; line-height: .94; letter-spacing: -.035em; margin-bottom: 28px; }
+.hero h1 span { white-space: nowrap; }
 .hero-lede { font-size: 1.15rem; max-width: 34em; color: var(--ink-2); }
 .hero-search { margin-top: 20px; max-width: 460px; }
 .hero-search-row { display: flex; gap: 8px; margin-top: 6px; }
@@ -437,6 +460,7 @@ body.is-checkout { background: var(--white); }
   .who { display: none; }
   .hero, .building-layout, .group-layout, .checkout, .invite, .auth { grid-template-columns: 1fr; }
   .hero-copy { padding: 40px var(--gutter); }
+  .hero h1 { font-size: clamp(1.6rem, 9cqi, 3rem); }
   .hero-feature { min-height: 380px; }
   .lineup-row { grid-template-columns: 1fr; gap: 12px; }
   .how-steps { grid-template-columns: 1fr 1fr; }

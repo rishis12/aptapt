@@ -117,7 +117,7 @@ def save_plan(db, checkout, floor_plan, move_in, floor_plans, earliest_move_in):
     except ValueError:
         raise PaymentError("Choose a move-in date.") from None
     if earliest_move_in and move < earliest_move_in:
-        raise PaymentError(f"Move-in can't be before {earliest_move_in:%B %-d, %Y}.")
+        raise PaymentError(f"Move-in can't be before {clock.strftime(earliest_move_in, '%B %-d, %Y')}.")
     db.execute("UPDATE checkouts SET floor_plan = ?, move_in = ?, step = 'application' WHERE id = ?",
                (floor_plan, move.isoformat(), checkout["id"]))
 

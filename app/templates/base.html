@@ -73,6 +73,17 @@
     {% block content %}{% endblock %}
   </main>
 
+  <div id="page-loading" class="page-loading" aria-hidden="true">
+    <div class="skeleton-block sk-title"></div>
+    <div class="skeleton-block sk-line" style="width: 85%"></div>
+    <div class="skeleton-block sk-line" style="width: 60%"></div>
+    <div class="sk-row">
+      <div class="skeleton-block sk-card"></div>
+      <div class="skeleton-block sk-card"></div>
+      <div class="skeleton-block sk-card"></div>
+    </div>
+  </div>
+
   {% block footer %}
   <footer class="site-footer">
     <p>aptapt helps Madison renters lease as a group. Building details come from public sources. Property managers shown here are fictional, and no payment is ever collected.</p>
