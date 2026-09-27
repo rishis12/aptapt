@@ -56,6 +56,25 @@
   {% endif %}
 {%- endmacro %}
 
+{% macro ai_card(apt, r, fallback=False) -%}
+  <li>
+    <a class="listing-item" href="{{ url_for('apartments.detail', slug=r.slug) }}" data-marker="{{ r.slug }}">
+      {{ photo(apt, apt.photos|fromjson, 'listing-photo') }}
+      <div class="listing-body">
+        <div class="listing-head">
+          <h2>{{ r.name }}</h2>
+          {% if r.distance is not none %}<span class="muted">{{ '%.1f'|format(r.distance) }} mi</span>{% endif %}
+        </div>
+        {% if fallback %}
+          <p class="muted">Didn't match: {{ r.knocked_out_by }}</p>
+        {% else %}
+          <ul class="ai-reasons">{% for reason in r.reasons %}<li>{{ reason }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+    </a>
+  </li>
+{%- endmacro %}
+
 {% macro rent(apt) -%}
   {% if apt.rent_min %}{{ apt.rent_min|money }}{% if apt.rent_max and apt.rent_max != apt.rent_min %}–{{ apt.rent_max|money }}{% endif %}{% if apt.leasing == 'per_bed' %} per bed{% endif %}{% else %}Pricing not published{% endif %}
 {%- endmacro %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% import "_ui.html" as ui with context %}
-{% block title %}Buildings near {{ zip }}{% endblock %}
+{% block title %}{% if ai_mode %}AI search{% else %}Buildings near {{ zip }}{% endif %}{% endblock %}
 {% block body_class %}is-browse{% endblock %}
 {% block main_class %}browse{% endblock %}
 {% block head %}
@@ -9,6 +9,57 @@
 {% endblock %}
 {% block footer %}{% endblock %}
 {% block content %}
+{% if ai_mode %}
+<section class="browse-list">
+  <form class="browse-filter" method="get" action="{{ url_for('apartments.search_ai') }}">
+    <label>Describe what you want
+      <input type="text" name="q" value="{{ ai_query }}" placeholder="2BR near campus under $1,100 each for 4 of us" required>
+    </label>
+    <button class="btn btn-quiet">Search</button>
+  </form>
+
+  {% if ai_query %}
+    <p class="ai-parser-label">Parsed by {{ 'Gemini' if ai_parser == 'gemini' else 'offline rules' }}</p>
+
+    {% if ai_intent %}
+      <div class="ai-chips">
+        {% if ai_intent.place %}<span class="chip">near {{ center.label if center else ai_intent.place }}</span>{% endif %}
+        {% if ai_intent.budget_max %}<span class="chip">under {{ ai_intent.budget_max|money }}{% if ai_intent.budget_basis == 'per_person' %}/person{% endif %}</span>{% endif %}
+        {% if ai_intent.group_size %}<span class="chip">{{ ai_intent.group_size }} renters</span>{% endif %}
+        {% if ai_intent.bedrooms_min is not none %}<span class="chip">{{ ai_intent.bedrooms_min }}+ bed</span>{% endif %}
+        {% if ai_intent.kind %}<span class="chip">{{ ai_intent.kind }}</span>{% endif %}
+        {% for a in ai_intent.must_have_amenities %}<span class="chip">{{ a|replace('_', ' ') }}</span>{% endfor %}
+      </div>
+      {% if ai_intent.unparsed %}<p class="muted">We ignored: "{{ ai_intent.unparsed|join('", "') }}"</p>{% endif %}
+    {% endif %}
+
+    {% if ai_off_topic %}
+      <p class="empty">aptapt only covers Madison, WI for now.</p>
+    {% else %}
+      <h1 class="browse-count">{{ ai_results.fits|length }} building{{ '' if ai_results.fits|length == 1 else 's' }} match</h1>
+      <ol class="listing">
+        {% for r in ai_results.fits %}{{ ui.ai_card(building_by_slug[r.slug], r) }}
+        {% else %}<li class="empty">No buildings matched. Try loosening your budget or radius.</li>
+        {% endfor %}
+      </ol>
+
+      {% if ai_results.near_miss %}
+        <h2>Near misses</h2>
+        <ol class="listing">
+          {% for r in ai_results.near_miss %}{{ ui.ai_card(building_by_slug[r.slug], r) }}{% endfor %}
+        </ol>
+      {% endif %}
+
+      {% if ai_results.fallback %}
+        <h2>Closest buildings that didn't match</h2>
+        <ol class="listing">
+          {% for r in ai_results.fallback %}{{ ui.ai_card(building_by_slug[r.slug], r, fallback=True) }}{% endfor %}
+        </ol>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+</section>
+{% else %}
 <section class="browse-list">
   <form class="browse-filter" method="get" action="{{ url_for('apartments.search') }}">
     <label>Near
@@ -53,6 +104,7 @@
     {% endfor %}
   </ol>
 </section>
+{% endif %}
 <section class="browse-map" aria-label="Map">
   <div id="map" data-center='{{ center|tojson }}' data-radius="{{ radius }}" data-markers='{{ markers|tojson }}'></div>
 </section>

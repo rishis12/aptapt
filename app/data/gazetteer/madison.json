@@ -1,0 +1,68 @@
+{
+  "capitol_square": {
+    "label": "Capitol Square",
+    "lat": 43.0747,
+    "lng": -89.3842,
+    "aliases": ["capitol square", "the capitol", "state capitol", "downtown capitol", "the square"]
+  },
+  "state_street": {
+    "label": "State Street",
+    "lat": 43.0731,
+    "lng": -89.3889,
+    "aliases": ["state street", "state st"]
+  },
+  "capitol_east": {
+    "label": "Capitol East / East Wash",
+    "lat": 43.0799,
+    "lng": -89.3764,
+    "aliases": ["capitol east", "east wash", "east washington", "e washington ave", "east washington avenue"]
+  },
+  "uw_campus": {
+    "label": "UW Campus / Bascom",
+    "lat": 43.0755,
+    "lng": -89.4017,
+    "aliases": ["uw campus", "uw", "campus", "bascom", "bascom hill", "university of wisconsin"]
+  },
+  "camp_randall": {
+    "label": "Camp Randall",
+    "lat": 43.0700,
+    "lng": -89.4127,
+    "aliases": ["camp randall", "randall stadium", "the stadium"]
+  },
+  "library_mall": {
+    "label": "Library Mall",
+    "lat": 43.0745,
+    "lng": -89.4004,
+    "aliases": ["library mall"]
+  },
+  "langdon": {
+    "label": "Langdon Street",
+    "lat": 43.0765,
+    "lng": -89.3960,
+    "aliases": ["langdon", "langdon street", "frat row"]
+  },
+  "monona_terrace": {
+    "label": "Monona Terrace",
+    "lat": 43.0716,
+    "lng": -89.3838,
+    "aliases": ["monona terrace"]
+  },
+  "james_madison_park": {
+    "label": "James Madison Park",
+    "lat": 43.0796,
+    "lng": -89.3820,
+    "aliases": ["james madison park", "james madison", "the park"]
+  },
+  "union_south": {
+    "label": "Union South",
+    "lat": 43.0723,
+    "lng": -89.4090,
+    "aliases": ["union south"]
+  },
+  "kohl_center": {
+    "label": "Kohl Center",
+    "lat": 43.0696,
+    "lng": -89.4009,
+    "aliases": ["kohl center", "the kohl center"]
+  }
+}

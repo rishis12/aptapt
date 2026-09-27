@@ -7,12 +7,20 @@
   <div class="hero-copy">
     <h1><span>Sign together.</span><br><span>Pay less.</span></h1>
     <p class="hero-lede">Buildings give their best deals to whoever fills a floor. aptapt lets renters commit as a group, so the leasing office sees ten signatures instead of one, and the discount goes to all of you.</p>
+    <form class="hero-search hero-search-ai" method="get" action="{{ url_for('apartments.search_ai') }}">
+      <label for="ai-q">Describe what you want</label>
+      <div class="hero-search-row">
+        <input id="ai-q" name="q" type="text" placeholder="2BR near campus under $1,100 each for 4 of us">
+        <button class="btn">Search</button>
+      </div>
+    </form>
+    <p class="hero-search-divider">or search by ZIP code</p>
     <form class="hero-search" method="get" action="{{ url_for('apartments.search') }}">
-      <label for="zip">Madison ZIP code</label>
+      <label for="zip" class="sr-only">Madison ZIP code</label>
       <div class="hero-search-row">
         <input id="zip" name="zip" value="{{ zip }}" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" list="madison-zips" required>
         <input type="hidden" name="radius" value="2">
-        <button class="btn">Show buildings</button>
+        <button class="btn btn-quiet">Show buildings</button>
       </div>
       <datalist id="madison-zips">{% for z in zips %}<option value="{{ z.zip }}">{{ z.label }}</option>{% endfor %}</datalist>
     </form>

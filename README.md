@@ -27,8 +27,8 @@ Configuration (environment variables):
 - `SECRET_KEY`
 - `AGENT_INVITE_THRESHOLD` (default 3)
 - `DEMO_MODE` (default 1; set it to 0 to hide the user switcher and demo controls)
-- `GEMINI_API_KEY` (unset by default; AI features are disabled until this is set)
-- `GEMINI_MODEL` (default `gemini-2.5-flash-lite`)
+- `GEMINI_API_KEY` (unset by default; the AI search parser falls back to offline rules until this is set)
+- `GEMINI_MODEL` (default `gemini-3.5-flash-lite`)
 
 ## How it works
 
@@ -45,6 +45,32 @@ Configuration (environment variables):
 - **Payments** accept only test cards: `4242 4242 4242 4242` succeeds, `4000 0027 6000 3184` asks for bank confirmation,
   and `4000 0000 0000 0002` is declined. Only the card brand and last 4 digits are stored.
 
+## Try the AI search
+
+The homepage has a plain-English search box (e.g. "2BR near campus under $1,100 each for 4 of us") next to the
+ZIP box. Gemini only *parses* the query into a structured intent (structured JSON output, temperature 0); matching,
+ranking, and the "why" text are all plain Python (`app/ai/match.py`) so results are deterministic and testable.
+Without `GEMINI_API_KEY` set, an offline regex/keyword parser takes over automatically -- the app never breaks in
+a demo because of the API.
+
+Setup:
+```bash
+pip install google-genai   # already in requirements.txt
+export GEMINI_API_KEY=...
+```
+
+Try it from the command line against a Chicago, River North test fixture (`tests/fixtures/river_north/`) so you
+never need a real Madison-shaped query to see it work:
+```bash
+python scripts/try_ai_search.py "2 bedroom near the Merchandise Mart, under $1800 each, 2 of us"
+python scripts/try_ai_search.py --offline "party of 5 near the riverwalk, separate units"
+python scripts/try_ai_search.py --city madison "studio near state street under 1200"
+python scripts/try_ai_search.py --suite --offline   # 10 canned queries, pass/fail per line
+```
+Flags: `--city madison|river_north` (default river_north), `--offline` (force the rule-based parser), `--no-cache`,
+`--json` (machine-readable output). Parses are cached in `instance/intent_cache.json` so repeated queries never
+hit the API twice.
+
 ## Data and photos
 
 Building facts live in `app/data/buildings.json`, with sources and caveats for each building. Photos are the
@@ -60,8 +86,10 @@ app/
   payments.py    test-mode checkout and deposit ledger
   geo.py         ZIP lookup and radius search
   seed.py        buildings, fictional managers, demo scenarios
+  ai/            AI search: intent.py (Gemini parses), match.py (pure ranking, no LLM), data.py, vocab.py
   routes/        auth, apartments, groups, checkout, agent, pitch, demo
   templates/     Jinja pages and htmx partials
   static/        CSS, JS, vendored htmx, building photos
-tests/           service tests and end-to-end HTTP tests
+tests/           service tests, end-to-end HTTP tests, and fixtures/river_north/ for AI search tests
+scripts/         try_ai_search.py, a CLI for trying the AI search pipeline by hand
 ```

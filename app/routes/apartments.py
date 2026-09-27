@@ -4,6 +4,9 @@ from flask import Blueprint, abort, current_app, flash, g, redirect, render_temp
 
 from .. import geo, payments
 from .. import groups as svc
+from ..ai import data as ai_data
+from ..ai import match as ai_match
+from ..ai.intent import intent_to_dict, parse_intent
 from ..db import get_db
 from .auth import renter_required
 
@@ -54,6 +57,66 @@ def search():
     } for r in results]
     return render_template("search.html", results=results, markers=markers, center=dict(center), zip=zip_code,
                            radius=radius, zips=geo.supported_zips(db), radius_choices=geo.RADIUS_CHOICES)
+
+
+def _live_madison_stats(db):
+    """{slug: {committed_count, target, offer_title}} for buildings with an active offer --
+    how match() learns about group momentum without touching the DB itself."""
+    stats = {}
+    for apt in db.execute("SELECT id, slug FROM apartments"):
+        s = svc.apartment_stats(db, apt["id"])
+        if s["offer"]:
+            stats[apt["slug"]] = {
+                "committed_count": s["committed_count"],
+                "target": s["offer"]["required_size"],
+                "offer_title": s["offer"]["title"],
+            }
+    return stats
+
+
+@bp.get("/search/ai")
+def search_ai():
+    """Plain-English search: Gemini (or the offline fallback) only parses the query into a
+    SearchIntent; matching, ranking, and the "why" text are all plain Python (app/ai/match.py)."""
+    db = get_db()
+    q = request.args.get("q", "").strip()
+    intent = None
+    parser_used = None
+    results = {"fits": [], "near_miss": [], "fallback": []}
+    off_topic = False
+    center = None
+
+    if q:
+        intent, parser_used = parse_intent(q, city="madison")
+        gazetteer = ai_data.load_gazetteer("madison")
+        if intent.city and intent.city != "madison":
+            off_topic = True
+            flash("aptapt only covers Madison, WI for now.", "error")
+        else:
+            buildings = ai_data.load_buildings("madison")
+            results = ai_match.match(intent, buildings, gazetteer, stats=_live_madison_stats(db))
+        if intent.place and intent.place in gazetteer:
+            place = gazetteer[intent.place]
+            center = {"lat": place["lat"], "lng": place["lng"], "label": place["label"]}
+
+    building_by_slug = {a["slug"]: a for a in db.execute("SELECT * FROM apartments")}
+    all_results = results["fits"] + results["near_miss"] + results["fallback"]
+    markers = [{
+        "slug": r["slug"], "name": r["name"],
+        "lat": building_by_slug[r["slug"]]["lat"], "lng": building_by_slug[r["slug"]]["lng"],
+        "url": url_for("apartments.detail", slug=r["slug"]),
+    } for r in all_results if r["slug"] in building_by_slug]
+
+    if center is None:
+        default_center = geo.zip_center(db, current_app.config["DEFAULT_ZIP"])
+        center = dict(default_center) if default_center else None
+
+    return render_template(
+        "search.html", ai_mode=True, ai_query=q, ai_intent=intent, ai_parser=parser_used,
+        ai_results=results, ai_off_topic=off_topic, building_by_slug=building_by_slug,
+        center=center, radius=(intent.radius_miles if intent and intent.radius_miles else 1), markers=markers,
+        zips=geo.supported_zips(db), radius_choices=geo.RADIUS_CHOICES,
+    )
 
 
 @bp.get("/buildings/<slug>")
