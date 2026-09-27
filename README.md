@@ -28,7 +28,7 @@ Configuration (environment variables):
 - `AGENT_INVITE_THRESHOLD` (default 3)
 - `DEMO_MODE` (default 1; set it to 0 to hide the user switcher and demo controls)
 - `GEMINI_API_KEY` (unset by default; the AI search parser falls back to offline rules until this is set)
-- `GEMINI_MODEL` (default `gemini-3.5-flash-lite`)
+- `GEMINI_MODEL` (default `gemini-3.5-flash`)
 
 ## How it works
 

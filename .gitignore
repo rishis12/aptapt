@@ -4,3 +4,6 @@ __pycache__/
 instance/
 .pytest_cache/
 .playwright-mcp/
+tests/test_ai_intent.py
+tests/test_ai_match.py
+tests/fixtures/

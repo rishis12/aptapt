@@ -56,9 +56,10 @@
   {% endif %}
 {%- endmacro %}
 
-{% macro ai_card(apt, r, fallback=False) -%}
+{% macro ai_card(apt, r, fallback=False, linked=True) -%}
   <li>
-    <a class="listing-item" href="{{ url_for('apartments.detail', slug=r.slug) }}" data-marker="{{ r.slug }}">
+    {% set tag = linked and 'a' or 'div' %}
+    <{{ tag }} class="listing-item"{% if linked %} href="{{ url_for('apartments.detail', slug=r.slug) }}"{% endif %} data-marker="{{ r.slug }}">
       {{ photo(apt, apt.photos|fromjson, 'listing-photo') }}
       <div class="listing-body">
         <div class="listing-head">
@@ -71,7 +72,7 @@
           <ul class="ai-reasons">{% for reason in r.reasons %}<li>{{ reason }}</li>{% endfor %}</ul>
         {% endif %}
       </div>
-    </a>
+    </{{ tag }}>
   </li>
 {%- endmacro %}
 

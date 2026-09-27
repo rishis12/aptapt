@@ -119,6 +119,47 @@ def search_ai():
     )
 
 
+_DEMO_CITY = "river_north"
+_DEMO_CENTER = {"lat": 41.8925, "lng": -87.6298, "label": "River North, Chicago"}
+
+
+@bp.get("/ai-search-demo")
+def ai_search_demo():
+    """Demo only: the exact same parser/matcher as /search/ai (Gemini live if GEMINI_API_KEY is
+    set, offline fallback otherwise), pointed at the River North, Chicago test fixture instead of
+    the real Madison DB -- so you can show the AI search working across cities without it ever
+    touching production data or the "Madison only" gate."""
+    q = request.args.get("q", "").strip()
+    intent = None
+    parser_used = None
+    results = {"fits": [], "near_miss": [], "fallback": []}
+    center = None
+
+    if q:
+        intent, parser_used = parse_intent(q, city=_DEMO_CITY)
+        gazetteer = ai_data.load_gazetteer(_DEMO_CITY)
+        buildings = ai_data.load_buildings(_DEMO_CITY)
+        results = ai_match.match(intent, buildings, gazetteer)
+        if intent.place and intent.place in gazetteer:
+            place = gazetteer[intent.place]
+            center = {"lat": place["lat"], "lng": place["lng"], "label": place["label"]}
+
+    building_by_slug = {b["slug"]: b for b in ai_data.load_buildings(_DEMO_CITY)}
+    all_results = results["fits"] + results["near_miss"] + results["fallback"]
+    markers = [{
+        "slug": r["slug"], "name": r["name"],
+        "lat": building_by_slug[r["slug"]]["lat"], "lng": building_by_slug[r["slug"]]["lng"],
+        "url": "#",
+    } for r in all_results if r["slug"] in building_by_slug]
+
+    return render_template(
+        "search.html", ai_mode=True, ai_demo=True, ai_query=q, ai_intent=intent, ai_parser=parser_used,
+        ai_results=results, ai_off_topic=False, building_by_slug=building_by_slug,
+        center=center or _DEMO_CENTER, radius=(intent.radius_miles if intent and intent.radius_miles else 1),
+        markers=markers, zips=[], radius_choices=[],
+    )
+
+
 @bp.get("/buildings/<slug>")
 def detail(slug):
     db = get_db()

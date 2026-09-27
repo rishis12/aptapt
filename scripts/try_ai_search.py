@@ -98,8 +98,11 @@ def cmd_suite(args):
 
         if key_present:
             live_intent, live_parser, _ = _run(query, "river_north", False, not args.no_cache)
-            if live_parser == "gemini" and asdict(live_intent) != asdict(intent):
-                print(f"         differs from offline parse: offline={asdict(intent)} gemini={asdict(live_intent)}")
+            # "explanation" is Gemini-only display text, not a decision field -- exclude it from the diff.
+            offline_fields = {k: v for k, v in asdict(intent).items() if k != "explanation"}
+            live_fields = {k: v for k, v in asdict(live_intent).items() if k != "explanation"}
+            if live_parser == "gemini" and live_fields != offline_fields:
+                print(f"         differs from offline parse: offline={offline_fields} gemini={live_fields}")
 
     print(f"\n{len(SUITE) - failures}/{len(SUITE)} passed")
     return 1 if failures else 0

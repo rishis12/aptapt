@@ -16,9 +16,9 @@ from typing import List, Optional
 
 from .vocab import AMENITY_ENUM, AMENITY_SYNONYMS, BUDGET_BASIS_ENUM, FLOOR_PLAN_ENUM, KIND_ENUM
 
-PROMPT_VERSION = "v2"
-# gemini-2.5-flash-lite was retired for new users; the live API's 404 pointed at this model.
-DEFAULT_MODEL = "gemini-3.5-flash-lite"
+PROMPT_VERSION = "v3"
+# gemini-2.5-flash-lite was retired for new users; running on Gemini 3.5 Flash instead.
+DEFAULT_MODEL = "gemini-3.5-flash"
 CACHE_PATH = Path(__file__).resolve().parents[2] / "instance" / "intent_cache.json"
 
 _WORD_NUMBERS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
@@ -40,6 +40,7 @@ class SearchIntent:
     kind: Optional[str] = None  # "student" | "market"
     must_have_amenities: List[str] = field(default_factory=list)
     unparsed: List[str] = field(default_factory=list)
+    explanation: Optional[str] = None  # Gemini's own one-sentence paraphrase, for display only -- never fed to match()
 
 
 # --- Gemini parser -----------------------------------------------------------
@@ -50,7 +51,10 @@ class SearchIntent:
 _SYSTEM_INSTRUCTION = (
     "Extract a structured apartment-search intent from a renter's plain-English query. "
     "Only extract what the query actually says -- leave a field null (or empty list) rather than guessing. "
-    "Put any leftover fragments that don't map to any field above into unparsed."
+    "Put any leftover fragments that don't map to any field above into unparsed. "
+    "Also write a short, casual, one-sentence explanation, in your own voice, of what you understood from the "
+    "query -- e.g. \"Got it -- a 2-bedroom near the Merchandise Mart, under $1,800 each, for 2 people.\" "
+    "This is shown to the user as proof you actually read their query, so make it specific to what they wrote."
 )
 
 
@@ -77,10 +81,12 @@ def _response_schema(gazetteer):
             "must_have_amenities": {"type": "ARRAY", "items": {"type": "STRING", "enum": AMENITY_ENUM}},
             "unparsed": {"type": "ARRAY", "items": {"type": "STRING"},
                           "description": "Short fragments of the query that don't map to any field above."},
+            "explanation": {"type": "STRING",
+                             "description": "A short, casual, one-sentence paraphrase of what you understood, in your own voice."},
         },
         "required": ["city", "place", "radius_miles", "budget_min", "budget_max", "budget_basis",
                      "group_size", "living_together", "bedrooms_min", "floor_plans", "kind",
-                     "must_have_amenities", "unparsed"],
+                     "must_have_amenities", "unparsed", "explanation"],
     }
 
 
@@ -368,13 +374,16 @@ def normalize_intent(raw, gazetteer):
     city = raw.get("city")
     city = (str(city).strip().lower() or None) if city is not None else None
 
+    explanation = raw.get("explanation")
+    explanation = explanation.strip() if isinstance(explanation, str) and explanation.strip() else None
+
     return SearchIntent(
         city=city, place=place, radius_miles=radius_miles,
         budget_min=int(budget_min) if budget_min is not None else None,
         budget_max=int(budget_max) if budget_max is not None else None,
         budget_basis=budget_basis, group_size=group_size, living_together=living_together,
         bedrooms_min=bedrooms_min, floor_plans=floor_plans, kind=kind,
-        must_have_amenities=amenities, unparsed=unparsed,
+        must_have_amenities=amenities, unparsed=unparsed, explanation=explanation,
     )
 
 

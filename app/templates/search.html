@@ -11,15 +11,20 @@
 {% block content %}
 {% if ai_mode %}
 <section class="browse-list">
-  <form class="browse-filter" method="get" action="{{ url_for('apartments.search_ai') }}">
+  {% if ai_demo %}
+    <p class="ai-parser-label">Demo: River North, Chicago test data, isolated from the real Madison app.</p>
+  {% endif %}
+  <form class="browse-filter" method="get" action="{{ url_for('apartments.ai_search_demo' if ai_demo else 'apartments.search_ai') }}">
     <label>Describe what you want
-      <input type="text" name="q" value="{{ ai_query }}" placeholder="2BR near campus under $1,100 each for 4 of us" required>
+      <input type="text" name="q" value="{{ ai_query }}" placeholder="{{ '2 bedroom near the Merchandise Mart, under $1800 each, 2 of us' if ai_demo else '2BR near campus under $1,100 each for 4 of us' }}" required>
     </label>
     <button class="btn btn-quiet">Search</button>
   </form>
 
   {% if ai_query %}
-    <p class="ai-parser-label">Parsed by {{ 'Gemini' if ai_parser == 'gemini' else 'offline rules' }}</p>
+    {% if ai_intent and ai_intent.explanation %}
+      <p class="ai-explanation">&#10024; Gemini: &ldquo;{{ ai_intent.explanation }}&rdquo;</p>
+    {% endif %}
 
     {% if ai_intent %}
       <div class="ai-chips">
@@ -38,7 +43,7 @@
     {% else %}
       <h1 class="browse-count">{{ ai_results.fits|length }} building{{ '' if ai_results.fits|length == 1 else 's' }} match</h1>
       <ol class="listing">
-        {% for r in ai_results.fits %}{{ ui.ai_card(building_by_slug[r.slug], r) }}
+        {% for r in ai_results.fits %}{{ ui.ai_card(building_by_slug[r.slug], r, linked=not ai_demo) }}
         {% else %}<li class="empty">No buildings matched. Try loosening your budget or radius.</li>
         {% endfor %}
       </ol>
@@ -46,14 +51,14 @@
       {% if ai_results.near_miss %}
         <h2>Near misses</h2>
         <ol class="listing">
-          {% for r in ai_results.near_miss %}{{ ui.ai_card(building_by_slug[r.slug], r) }}{% endfor %}
+          {% for r in ai_results.near_miss %}{{ ui.ai_card(building_by_slug[r.slug], r, linked=not ai_demo) }}{% endfor %}
         </ol>
       {% endif %}
 
       {% if ai_results.fallback %}
         <h2>Closest buildings that didn't match</h2>
         <ol class="listing">
-          {% for r in ai_results.fallback %}{{ ui.ai_card(building_by_slug[r.slug], r, fallback=True) }}{% endfor %}
+          {% for r in ai_results.fallback %}{{ ui.ai_card(building_by_slug[r.slug], r, fallback=True, linked=not ai_demo) }}{% endfor %}
         </ol>
       {% endif %}
     {% endif %}

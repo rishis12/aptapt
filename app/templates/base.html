@@ -41,6 +41,9 @@
     </a>
     <nav class="site-nav">
       <a href="{{ url_for('apartments.search') }}" {% if request.endpoint == 'apartments.search' %}aria-current="page"{% endif %}>Buildings</a>
+      {% if demo_mode %}
+        <a href="{{ url_for('apartments.ai_search_demo') }}" {% if request.endpoint == 'apartments.ai_search_demo' %}aria-current="page"{% endif %}>AI search</a>
+      {% endif %}
       {% if current_user and current_user.role == 'renter' %}
         <a href="{{ url_for('groups.my_groups') }}" {% if request.endpoint == 'groups.my_groups' %}aria-current="page"{% endif %}>Your groups</a>
       {% elif current_user %}

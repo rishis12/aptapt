@@ -179,6 +179,7 @@ label.check input { width: auto; min-height: 0; margin-top: 4px; }
 
 /* ---- AI search ------------------------------------------------------------ */
 .ai-parser-label { color: var(--slate); font-size: .8rem; margin: 4px 0 12px; }
+.ai-explanation { background: var(--lit-soft); border-radius: var(--radius); padding: 10px 14px; margin: 10px 0 16px; font-size: .92rem; font-style: italic; color: var(--ink-2); }
 .ai-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
 .chip { display: inline-flex; align-items: center; background: var(--lit-soft); color: var(--ink); border-radius: 999px; padding: 4px 12px; font-size: .85rem; font-weight: 600; }
 .ai-reasons { margin: 4px 0 0; padding: 0; list-style: none; color: var(--ink-2); font-size: .9rem; }
